@@ -7,7 +7,7 @@ import cors from "cors";
 import message from "./models/messages.models.js";
 import messagesRoutes from "./routes/messages.routes.js"
 import phonesRoutes from "./routes/phones.routes.js"
-import { PORT, whatsappToken } from "./config";
+import { PORT, whatsappToken } from "./config.js";
 const app = express();
 app.listen( PORT.PORT , () => console.log("webhook is listening"));
 app.use(morgan("dev"));
