@@ -8,7 +8,6 @@ const messagesController = {};
 
 
 messagesController.postMessage = async (req, res) => {
-    console.log("holas")
     let url = "https://security.viajobien.com/auth/token";
     let data = { id: "lucas.matw", password: "ec03bien" };
     try {

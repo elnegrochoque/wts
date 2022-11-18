@@ -11,3 +11,7 @@ export const urlJWT = {
 export const PORT = {
     PORT: 4000
 }
+export const JWTFlag = {
+    JWTFlag: true,
+    permissionName: "whatsapp"
+}

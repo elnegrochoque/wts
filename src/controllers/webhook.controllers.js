@@ -13,15 +13,15 @@ app.post("/webhook", async (req, res) => {
             req.body.entry[0].changes[0].value.messages &&
             req.body.entry[0].changes[0].value.messages[0]
         ) {
-            console.log("escribieron")
-            //console.log(req.body.entry[0].changes[0].value.messages[0].text.body)
-            //console.log(req.body.entry[0].changes[0].value.messages[0].from)
-            //console.log(req.body.entry[0].changes[0].value.metadata.display_phone_number)
+
+
             try {
+                const to= req.body.entry[0].changes[0].value.metadata.display_phone_number
+                await phone.findOneAndUpdate({ number: to }, {$inc : {'hits' : 1}});
                 const newMessage = new message({
                     message: req.body.entry[0].changes[0].value.messages[0].text.body,
                     from: req.body.entry[0].changes[0].value.messages[0].from,
-                    to: req.body.entry[0].changes[0].value.metadata.display_phone_number
+                    to: to
                 })
                 await newMessage.save()
             } catch (error) {
