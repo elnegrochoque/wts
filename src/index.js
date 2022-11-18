@@ -1,7 +1,7 @@
 import request from "request";
 import express from "express";
 import morgan from "morgan";
-import "./database";
+import "./database.js";
 import "./controllers/webhook.controllers.js"
 import cors from "cors";
 import message from "./models/messages.models.js";
