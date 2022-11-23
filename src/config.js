@@ -1,5 +1,5 @@
 export const mongoConf = {
-    url: "mongodb+srv://elnegrochoque:elnegrochoque_11@cluster0.yy3fo.mongodb.net/?retryWrites=true&w=majority",
+    url: "mongodb://elnegrochoque:elnegrochoque_11@cluster0-shard-00-00.yy3fo.mongodb.net:27017,cluster0-shard-00-01.yy3fo.mongodb.net:27017,cluster0-shard-00-02.yy3fo.mongodb.net:27017/?ssl=true&replicaSet=atlas-zjhyyk-shard-0&authSource=admin&retryWrites=true&w=majority",
     dbName: "apiwhatsapp"
 }
 export const whatsappToken = {

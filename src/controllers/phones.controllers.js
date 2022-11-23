@@ -222,14 +222,14 @@ phonesController.postUpdatePhoneJWT = async (req, res) => {
             } else {
                 try {
                     const { phoneNumber, businessUnit, name, email, enable, oldNumber } = req.body;
-                    const newPhone = new phone({
+                    const newPhone = {
                         name: name,
                         email: email,
                         businessUnit: businessUnit,
                         phoneNumber: phoneNumber,
                         enable: enable,
                         hits: 0
-                    });
+                    };
                     const updatePhone = await phone.findOneAndUpdate({ number: oldNumber }, newPhone, { useFindAndModify: true });
                     if (updatePhone == null) {
                         res.status(201).json({
