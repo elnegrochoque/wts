@@ -184,15 +184,15 @@ phonesController.getPhoneHits = async (req, res) => {
 phonesController.postUpdatePhone = async (req, res) => {
     try {
         const { phoneNumber, businessUnit, name, email, enable, oldNumber } = req.body;
-        const newPhone = new phone({
+        const newPhone = {
             name: name,
             email: email,
             businessUnit: businessUnit,
             phoneNumber: phoneNumber,
             enable: enable,
             hits: 0
-        });
-        const updatePhone = await phone.findOneAndUpdate({ number: oldNumber }, newPhone, { useFindAndModify: true });
+        };
+        const updatePhone = await phone.findOneAndUpdate({ phoneNumber: oldNumber }, newPhone, { useFindAndModify: true });
         if (updatePhone == null) {
             res.status(201).json({
                 mensaje: "Teléfono inexistente",
@@ -230,7 +230,7 @@ phonesController.postUpdatePhoneJWT = async (req, res) => {
                         enable: enable,
                         hits: 0
                     };
-                    const updatePhone = await phone.findOneAndUpdate({ number: oldNumber }, newPhone, { useFindAndModify: true });
+                    const updatePhone = await phone.findOneAndUpdate({ phoneNumber: oldNumber }, newPhone, { useFindAndModify: true });
                     if (updatePhone == null) {
                         res.status(201).json({
                             mensaje: "Teléfono inexistente",
