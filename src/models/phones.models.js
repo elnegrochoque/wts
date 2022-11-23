@@ -2,10 +2,12 @@ import mongoose, { Schema } from "mongoose";
 
 const phoneSchema = new Schema(
     {
-        number: { type: String, unique: true },
+        phoneNumber: { type: String, unique: true },
+        name: String,
+        email: String,
         hits: Number,
-        active: Boolean,
-        country: String
+        enable : Boolean,
+        businessUnit: String
     }, { timestamps: true }
 
 );

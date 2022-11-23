@@ -13,5 +13,7 @@ export const PORT = {
 }
 export const JWTFlag = {
     JWTFlag: true,
-    permissionName: "whatsapp"
+    permissionNameView: "whatsapp.view",
+    permissionNameEdit: "whatsapp.edit",
+    jwtKeyFileName: "jwt-key"
 }

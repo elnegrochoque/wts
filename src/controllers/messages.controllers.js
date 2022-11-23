@@ -3,8 +3,40 @@ import message from "../models/messages.models.js";
 import jwt from "jsonwebtoken";
 import axios from "axios";
 import jwt_decode from "jwt-decode";
-import { urlJWT } from "../config.js";
+import { JWTFlag, urlJWT } from "../config.js";
+import fs from "fs"
 const messagesController = {};
+function unixTimestamp() {
+    return Math.floor(
+        Date.now() / 1000
+    )
+}
+
+export const permissionJWTVerify = async (token, permission) => {
+    let flagPermission = false
+    try {
+        const publicKey = fs.readFileSync('./src/'+JWTFlag.jwtKeyFileName)
+        jwt.verify(token, publicKey, { algorithms: 'RS256' }, async (error, authData) => {
+            if (error) {
+                console.log(error)
+            } else {
+                var decoded = jwt_decode(token);
+                const permissions = decoded.permissions.slice(11, -3)
+                const arrayPermissions = permissions.split("\"},{\"value\":\"")
+                for (let i = 0; i < arrayPermissions.length; i++) {
+                    if (arrayPermissions[i] == permission) {
+                        flagPermission = true
+                        break
+                    }
+                }
+            }
+        })
+        return flagPermission
+    } catch (error) {
+        console.log(error)
+
+    }
+}
 
 
 messagesController.postMessage = async (req, res) => {
@@ -56,29 +88,6 @@ messagesController.postMessage = async (req, res) => {
     //     res.sendStatus(403)
     // }
 };
-const permissionJWT = async (data) => {
-    let url = urlJWT;
-   
-    try {
-        const consulta = await axios.post(url, data)
-        console.log(consulta.data.token)
-        var decoded = jwt_decode(consulta.data.token);
-        console.log(decoded.permissions)
-        const permissions = decoded.permissions.slice(11, -3)
-        const arrayPermissions = permissions.split("\"},{\"value\":\"")
-        console.log(arrayPermissions)
-        for (let i = 0; i < arrayPermissions.length; i++) {
-            if (arrayPermissions[i] == "users") {
-                console.log("tiene permisos")
-                break
-            }
-        }
-        return true
-    } catch (error) {
-        console.log(error)
-        return false
-    }
-}
 
 messagesController.getMessage = async (req, res) => {
     const baererHeader = req.headers.authorization;
