@@ -259,5 +259,65 @@ phonesController.postUpdatePhoneJWT = async (req, res) => {
     }
 
 };
+phonesController.deletePhoneJWT = async (req, res) => {
+    try {
+        const baererHeader = req.headers.authorization;
+        if (typeof baererHeader !== 'undefined') {
+            const baererToken = baererHeader.split(" ")[1]
+            req.token = baererToken;
+            const permission = await permissionJWTVerify(baererToken, JWTFlag.permissionNameEdit)
+            if (permission == false) {
+                res.sendStatus(403)
+            } else {
+                try {
+                    const { oldNumber } = req.body;
+                    const deletePhone = await phone.deleteOne({ phoneNumber: oldNumber });
+                    console.log(deletePhone)
+                    if (deletePhone.deletedCount>0) {
+                        res.status(201).json({
+                            mensaje: "Teléfono eliminado",
+                        });
+                    } else {
+                        res.status(201).json({
+                            mensaje: "Teléfono no encontrado",
+                        });
+                    }
+                } catch (error) {
+                    console.log(error);
+                    res.status(500).json({
+                        mensaje: "Problemas al elminar el teléfono",
+                    });
+                }
+            }
+        } else {
+            res.sendStatus(403)
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            mensaje: "error al obtener informacion",
+        });
+    }
+};
 
+phonesController.deletePhone = async (req, res) => {
+    try {
+        const { oldNumber } = req.body;
+        const deletePhone = await phone.deleteOne({ phoneNumber: oldNumber });
+        if (deletePhone.deletedCount>0) {
+            res.status(201).json({
+                mensaje: "Teléfono eliminado",
+            });
+        } else {
+            res.status(201).json({
+                mensaje: "Teléfono no encontrado",
+            });
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            mensaje: "Problemas al modificar el teléfono",
+        });
+    }
+};
 export default phonesController;

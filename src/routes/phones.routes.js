@@ -14,6 +14,8 @@ if (JWTFlag.JWTFlag === true) {
         .post(phonesController.getPhoneHitsJWT)
     router.route('/phone')
         .post(phonesController.postUpdatePhoneJWT)
+    router.route('/delphone')
+        .post(phonesController.deletePhoneJWT)
 } else {
     router.route('/phones')
         .post(phonesController.postCreatePhone)
@@ -23,6 +25,8 @@ if (JWTFlag.JWTFlag === true) {
         .post(phonesController.getPhoneHits)
     router.route('/phone')
         .post(phonesController.postUpdatePhone)
+    router.route('/delphone')
+        .post(phonesController.deletePhone)
 }
 
 export default router
