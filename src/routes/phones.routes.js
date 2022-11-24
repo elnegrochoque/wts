@@ -8,25 +8,27 @@ const router = Router();
 if (JWTFlag.JWTFlag === true) {
     router.route('/phones')
         .post(phonesController.postCreatePhoneJWT)
-    router.route('/getphones')
-        .post(phonesController.getPhonesJWT)
-    router.route('/phonehits')
-        .post(phonesController.getPhoneHitsJWT)
-    router.route('/phone')
-        .post(phonesController.postUpdatePhoneJWT)
-    router.route('/delphone')
-        .post(phonesController.deletePhoneJWT)
+        .get(phonesController.getPhonesJWT)
+        .delete(phonesController.deletePhoneJWT)
+        .put(phonesController.postUpdatePhoneJWT)
+    router.route('/phones/:id')
+        .get(phonesController.getPhoneJWT)
+    router.route('/phones/hits')
+        .get(phonesController.getPhoneHitsJWT)
+
+
+
 } else {
     router.route('/phones')
         .post(phonesController.postCreatePhone)
-    router.route('/getphones')
-        .post(phonesController.getPhones)
-    router.route('/phonehits')
-        .post(phonesController.getPhoneHits)
-    router.route('/phone')
-        .post(phonesController.postUpdatePhone)
-    router.route('/delphone')
-        .post(phonesController.deletePhone)
+        .get(phonesController.getPhones)
+        .delete(phonesController.deletePhone)
+        .put(phonesController.postUpdatePhone)
+    router.route('/phones/:id')
+        .get(phonesController.getPhone)
+    router.route('/phones/hits')
+        .get(phonesController.getPhoneHits)
+        
 }
 
 export default router

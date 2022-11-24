@@ -2,7 +2,7 @@ import mongoose, { Schema } from "mongoose";
 
 const phoneSchema = new Schema(
     {
-        phoneNumber: { type: String, unique: true },
+        phoneNumber: { type: String, unique: true, required: true},
         name: String,
         email: String,
         hits: Number,

@@ -320,4 +320,47 @@ phonesController.deletePhone = async (req, res) => {
         });
     }
 };
+phonesController.getPhone = async (req, res) => {
+    try {
+        const id = req.params.id
+        const objectPhone = await phone.findById(id)
+        res.status(200).json(objectPhone);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            mensaje: "error al obtener informacion",
+        });
+    }
+};
+phonesController.getPhoneJWT = async (req, res) => {
+    try {
+        const baererHeader = req.headers.authorization;
+        if (typeof baererHeader !== 'undefined') {
+            const baererToken = baererHeader.split(" ")[1]
+            req.token = baererToken;
+            const permission = await permissionJWTVerify(baererToken, JWTFlag.permissionNameView)
+            if (permission == false) {
+                res.sendStatus(403)
+            } else {
+                try {
+                    const id = req.params.id
+                    const objectPhone = await phone.findById(id);
+                    res.status(200).json(objectPhone);
+                } catch (error) {
+                    console.log(error);
+                    res.status(500).json({
+                        mensaje: "error al obtener informacion",
+                    });
+                }
+            }
+        } else {
+            res.sendStatus(403)
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            mensaje: "error al obtener informacion",
+        });
+    }
+};
 export default phonesController;
