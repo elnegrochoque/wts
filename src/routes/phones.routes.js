@@ -12,6 +12,7 @@ if (JWTFlag.JWTFlag === true) {
         .delete(phonesController.deletePhoneJWT)
         .put(phonesController.putPhoneJWT)
     router.route('/phones/:id')
+        .delete(phonesController.deletePhoneByIdJWT)
         .get(phonesController.getPhoneJWT)
         .put(phonesController.putPhoneByIdJWT)
     router.route('/phoneshits')
@@ -31,7 +32,7 @@ if (JWTFlag.JWTFlag === true) {
         .delete(phonesController.deletePhoneById)
     router.route('/phoneshits')
         .get(phonesController.getPhoneHits)
-        
+
 }
 
 export default router
