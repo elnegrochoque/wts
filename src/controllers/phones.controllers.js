@@ -2,7 +2,7 @@
 
 import { JWTFlag } from "../config.js";
 import phone from "../models/phones.models.js";
-import { permissionJWTVerify } from "./messages.controllers.js";
+import { permissionJWTVerify } from "./jwt.controllers.js";
 const phonesController = {};
 
 
@@ -137,12 +137,14 @@ phonesController.getPhoneHitsJWT = async (req, res) => {
                 res.sendStatus(403)
             } else {
                 try {
-                    const phones = await phone.find({ active: true }).sort("hits").limit(1);
-                    if (phones[0].hits >= 5) {
-                        await phone.updateMany({}, { hits: 0 })
-
-                    } else {
-                        await phone.findOneAndUpdate({ number: phones[0].number }, { $inc: { 'hits': 1 } });
+                    const phones = await phone.find({ enable: true }).sort("hits").limit(1);
+                    if (phones[0] && phones[0].hits) {
+                        if (phones[0].hits >= 5) {
+                            await phone.updateMany({}, { hits: 0 })
+                        }
+                        //else {
+                        //    await phone.findOneAndUpdate({ number: phones[0].number }, { $inc: { 'hits': 1 } });
+                        //}
                     }
                     res.status(200).json(phones);
                 } catch (error) {
@@ -165,12 +167,15 @@ phonesController.getPhoneHitsJWT = async (req, res) => {
 };
 phonesController.getPhoneHits = async (req, res) => {
     try {
-        const phones = await phone.find({ active: true }).sort("hits").limit(1);
-        if (phones[0].hits >= 5) {
-            await phone.updateMany({}, { hits: 0 })
+        const phones = await phone.find({ enable: true }).sort("hits").limit(1);
+        if (phones[0] && phones[0].hits) {
+            if (phones[0].hits >= 5) {
+                await phone.updateMany({}, { hits: 0 })
 
-        } else {
-            await phone.findOneAndUpdate({ number: phones[0].number }, { $inc: { 'hits': 1 } });
+            }
+            //else {
+            //    await phone.findOneAndUpdate({ number: phones[0].number }, { $inc: { 'hits': 1 } });
+            //}
         }
         res.status(200).json(phones);
     } catch (error) {
@@ -181,7 +186,7 @@ phonesController.getPhoneHits = async (req, res) => {
     }
 };
 
-phonesController.postUpdatePhone = async (req, res) => {
+phonesController.putPhone = async (req, res) => {
     try {
         const { phoneNumber, businessUnit, name, email, enable, oldNumber } = req.body;
         const newPhone = {
@@ -210,7 +215,7 @@ phonesController.postUpdatePhone = async (req, res) => {
         });
     }
 };
-phonesController.postUpdatePhoneJWT = async (req, res) => {
+phonesController.putPhoneJWT = async (req, res) => {
     try {
         const baererHeader = req.headers.authorization;
         if (typeof baererHeader !== 'undefined') {
@@ -259,6 +264,83 @@ phonesController.postUpdatePhoneJWT = async (req, res) => {
     }
 
 };
+
+phonesController.putPhoneById = async (req, res) => {
+    try {
+        const { phoneNumber, businessUnit, name, email, enable } = req.body;
+        const newPhone = {
+            name: name,
+            email: email,
+            businessUnit: businessUnit,
+            phoneNumber: phoneNumber,
+            enable: enable,
+            hits: 0
+        };
+        const updatePhone = await phone.findOneAndUpdate({ _id: req.params.id }, newPhone, { useFindAndModify: true });
+        if (updatePhone == null) {
+            res.status(201).json({
+                mensaje: "Teléfono inexistente",
+            });
+        } else {
+            res.status(201).json({
+                mensaje: "Teléfono modificado",
+            });
+        }
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            mensaje: "Problemas al modificar el teléfono",
+        });
+    }
+};
+phonesController.putPhoneByIdJWT = async (req, res) => {
+    try {
+        const baererHeader = req.headers.authorization;
+        if (typeof baererHeader !== 'undefined') {
+            const baererToken = baererHeader.split(" ")[1]
+            req.token = baererToken;
+            const permission = await permissionJWTVerify(baererToken, JWTFlag.permissionNameEdit)
+            if (permission == false) {
+                res.sendStatus(403)
+            } else {
+                try {
+                    const { phoneNumber, businessUnit, name, email, enable } = req.body;
+                    const newPhone = {
+                        name: name,
+                        email: email,
+                        businessUnit: businessUnit,
+                        phoneNumber: phoneNumber,
+                        enable: enable,
+                        hits: 0
+                    };
+                    const updatePhone = await phone.findOneAndUpdate({ _id: req.params.id }, newPhone, { useFindAndModify: true });
+                    if (updatePhone == null) {
+                        res.status(201).json({
+                            mensaje: "Teléfono inexistente",
+                        });
+                    } else {
+                        res.status(201).json({
+                            mensaje: "Teléfono modificado",
+                        });
+                    }
+                } catch (error) {
+                    console.log(error);
+                    res.status(500).json({
+                        mensaje: "Problemas al modificar el teléfono",
+                    });
+                }
+            }
+        } else {
+            res.sendStatus(403)
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            mensaje: "error al obtener informacion",
+        });
+    }
+};
 phonesController.deletePhoneJWT = async (req, res) => {
     try {
         const baererHeader = req.headers.authorization;
@@ -273,7 +355,7 @@ phonesController.deletePhoneJWT = async (req, res) => {
                     const { oldNumber } = req.body;
                     const deletePhone = await phone.deleteOne({ phoneNumber: oldNumber });
                     console.log(deletePhone)
-                    if (deletePhone.deletedCount>0) {
+                    if (deletePhone.deletedCount > 0) {
                         res.status(201).json({
                             mensaje: "Teléfono eliminado",
                         });
@@ -304,7 +386,66 @@ phonesController.deletePhone = async (req, res) => {
     try {
         const { oldNumber } = req.body;
         const deletePhone = await phone.deleteOne({ phoneNumber: oldNumber });
-        if (deletePhone.deletedCount>0) {
+        if (deletePhone.deletedCount > 0) {
+            res.status(201).json({
+                mensaje: "Teléfono eliminado",
+            });
+        } else {
+            res.status(201).json({
+                mensaje: "Teléfono no encontrado",
+            });
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            mensaje: "Problemas al modificar el teléfono",
+        });
+    }
+};
+
+phonesController.deletePhoneByIdJWT = async (req, res) => {
+    try {
+        const baererHeader = req.headers.authorization;
+        if (typeof baererHeader !== 'undefined') {
+            const baererToken = baererHeader.split(" ")[1]
+            req.token = baererToken;
+            const permission = await permissionJWTVerify(baererToken, JWTFlag.permissionNameEdit)
+            if (permission == false) {
+                res.sendStatus(403)
+            } else {
+                try {
+                    const deletePhone = await phone.deleteOne({ _id: req.params.id });
+                    if (deletePhone.deletedCount > 0) {
+                        res.status(201).json({
+                            mensaje: "Teléfono eliminado",
+                        });
+                    } else {
+                        res.status(201).json({
+                            mensaje: "Teléfono no encontrado",
+                        });
+                    }
+                } catch (error) {
+                    console.log(error);
+                    res.status(500).json({
+                        mensaje: "Problemas al elminar el teléfono",
+                    });
+                }
+            }
+        } else {
+            res.sendStatus(403)
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            mensaje: "error al obtener informacion",
+        });
+    }
+};
+
+phonesController.deletePhoneById = async (req, res) => {
+    try {
+        const deletePhone = await phone.deleteOne({ _id: req.params.id });
+        if (deletePhone.deletedCount > 0) {
             res.status(201).json({
                 mensaje: "Teléfono eliminado",
             });

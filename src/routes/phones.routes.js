@@ -10,10 +10,11 @@ if (JWTFlag.JWTFlag === true) {
         .post(phonesController.postCreatePhoneJWT)
         .get(phonesController.getPhonesJWT)
         .delete(phonesController.deletePhoneJWT)
-        .put(phonesController.postUpdatePhoneJWT)
+        .put(phonesController.putPhoneJWT)
     router.route('/phones/:id')
         .get(phonesController.getPhoneJWT)
-    router.route('/phones/hits')
+        .put(phonesController.putPhoneByIdJWT)
+    router.route('/phoneshits')
         .get(phonesController.getPhoneHitsJWT)
 
 
@@ -23,10 +24,12 @@ if (JWTFlag.JWTFlag === true) {
         .post(phonesController.postCreatePhone)
         .get(phonesController.getPhones)
         .delete(phonesController.deletePhone)
-        .put(phonesController.postUpdatePhone)
+        .put(phonesController.putPhone)
     router.route('/phones/:id')
         .get(phonesController.getPhone)
-    router.route('/phones/hits')
+        .put(phonesController.putPhoneById)
+        .delete(phonesController.deletePhoneById)
+    router.route('/phoneshits')
         .get(phonesController.getPhoneHits)
         
 }
