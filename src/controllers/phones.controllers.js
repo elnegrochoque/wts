@@ -6,7 +6,7 @@ import { permissionJWTVerify } from "./jwt.controllers.js";
 const phonesController = {};
 
 
-phonesController.getPhones = async (req, res) => {
+phonesController.getPhonesAll = async (req, res) => {
     try {
         const phones = await phone.find();
         res.status(200).json(phones);
@@ -16,6 +16,49 @@ phonesController.getPhones = async (req, res) => {
             mensaje: "error al obtener informacion",
         });
     }
+};
+phonesController.getPhones = async (req, res) => {
+
+    try {
+        if (req.query.bu && req.query.page) {
+            const bu = req.query.bu
+            const page = req.query.page
+            let elements = 5
+            let counter = 0
+            const phones = await phone.find({ businessUnit: bu });
+            if (req.query.elements) {
+                elements = req.query.elements
+                if (parseInt(req.query.elements) > phones.length) {
+                    elements = phone.length
+                }
+            }
+            const result = []
+            let lastPage = 1
+            if ((Math.round((phones.length) / elements)) > 1) {
+                lastPage = (Math.round((phones.length) / elements))
+            }
+            result.push({ "page": page, "maxObjectsPerPage": parseInt(req.query.elements), "totalObjects": phones.length, "lastPage": lastPage })
+            for (let index = (parseInt(page) - 1) * parseInt(elements); index < phones.length; index++) {
+                counter = counter + 1
+                if (counter > elements) {
+                    break
+                }
+                result.push(phones[index])
+            }
+            res.status(200).json(result);
+        }
+        else {
+            res.status(500).json({
+                mensaje: "error al obtener unidad de negocio o pagina",
+            });
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            mensaje: "error al obtener informacion",
+        });
+    }
+
 };
 phonesController.getPhonesJWT = async (req, res) => {
     try {
@@ -28,8 +71,38 @@ phonesController.getPhonesJWT = async (req, res) => {
                 res.sendStatus(403)
             } else {
                 try {
-                    const phones = await phone.find();
-                    res.status(200).json(phones);
+                    if (req.query.bu && req.query.page) {
+                        const bu = req.query.bu
+                        const page = req.query.page
+                        let elements = 5
+                        let counter = 0
+                        const phones = await phone.find({ businessUnit: bu });
+                        if (req.query.elements) {
+                            elements = req.query.elements
+                            if (parseInt(req.query.elements) > phones.length) {
+                                elements = phone.length
+                            }
+                        }
+                        const result = []
+                        let lastPage = 1
+                        if ((Math.round((phones.length) / elements)) > 1) {
+                            lastPage = (Math.round((phones.length) / elements))
+                        }
+                        result.push({ "page": page, "maxObjectsPerPage": parseInt(req.query.elements), "totalObjects": phones.length, "lastPage": lastPage })
+                        for (let index = (parseInt(page) - 1) * parseInt(elements); index < phones.length; index++) {
+                            counter = counter + 1
+                            if (counter > elements) {
+                                break
+                            }
+                            result.push(phones[index])
+                        }
+                        res.status(200).json(result);
+                    }
+                    else {
+                        res.status(500).json({
+                            mensaje: "error al obtener unidad de negocio o pagina",
+                        });
+                    }
                 } catch (error) {
                     console.log(error);
                     res.status(500).json({
