@@ -10,13 +10,13 @@ export const PORT = {
     PORT: 4000
 }
 export const JWTFlag = {
-    JWTFlag: true,
+    JWTFlag: false,
     permissionNameView: "whatsapp.view",
     permissionNameEdit: "whatsapp.edit",
     jwtKeyFileName: "jwt-key"
 }
 export const OwnJWT = {
-    Flag: false,
+    Flag: true,
     user: "admin",
     password: "admin",
     jwtkey: "jwt-key",

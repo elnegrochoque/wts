@@ -18,39 +18,62 @@ phonesController.getPhonesAll = async (req, res) => {
     }
 };
 phonesController.getPhones = async (req, res) => {
-
     try {
-        if (req.query.bu && req.query.page) {
-            const bu = req.query.bu
-            const page = req.query.page
-            let elements = 5
-            let counter = 0
-            const phones = await phone.find({ businessUnit: bu });
-            if (req.query.elements) {
-                elements = req.query.elements
-                if (parseInt(req.query.elements) > phones.length) {
-                    elements = phone.length
+        if (req.query.all && req.query.all == "true") {
+            if (req.query.page) {
+                const page = req.query.page
+                let elements = 5
+                if (req.query.elements) {
+                    elements = req.query.elements
                 }
-            }
-            const result = []
-            let lastPage = 1
-            if ((Math.round((phones.length) / elements)) > 1) {
-                lastPage = (Math.round((phones.length) / elements))
-            }
-            result.push({ "page": page, "maxObjectsPerPage": parseInt(req.query.elements), "totalObjects": phones.length, "lastPage": lastPage })
-            for (let index = (parseInt(page) - 1) * parseInt(elements); index < phones.length; index++) {
-                counter = counter + 1
-                if (counter > elements) {
-                    break
+                const phonesCount = await phone.count({});
+                const result = []
+                let lastPage = 1
+                if ((Math.round((phonesCount) / elements)) > 1) {
+                    lastPage = (Math.round((phonesCount) / elements))
                 }
-                result.push(phones[index])
+                result.push({ "page": page, "maxObjectsPerPage": parseInt(req.query.elements), "totalObjects": phonesCount, "lastPage": lastPage })
+                const phones = await phone.find({}).skip((elements * page) - elements).limit(elements);
+                result.push(phones)
+                res.status(200).json(result);
+            } else {
+                res.status(500).json({
+                    mensaje: "error al obtener paginado",
+                });
             }
-            res.status(200).json(result);
-        }
-        else {
-            res.status(500).json({
-                mensaje: "error al obtener unidad de negocio o pagina",
-            });
+        } else {
+            if (req.query.bu && req.query.page) {
+                const bu = req.query.bu
+                const page = req.query.page
+                let elements = 5
+                let counter = 0
+                const phones = await phone.find({ businessUnit: bu });
+                if (req.query.elements) {
+                    elements = req.query.elements
+                    if (parseInt(req.query.elements) > phones.length) {
+                        elements = phone.length
+                    }
+                }
+                const result = []
+                let lastPage = 1
+                if ((Math.round((phones.length) / elements)) > 1) {
+                    lastPage = (Math.round((phones.length) / elements))
+                }
+                result.push({ "page": page, "maxObjectsPerPage": parseInt(req.query.elements), "totalObjects": phones.length, "lastPage": lastPage })
+                for (let index = (parseInt(page) - 1) * parseInt(elements); index < phones.length; index++) {
+                    counter = counter + 1
+                    if (counter > elements) {
+                        break
+                    }
+                    result.push(phones[index])
+                }
+                res.status(200).json(result);
+            }
+            else {
+                res.status(500).json({
+                    mensaje: "error al obtener unidad de negocio o pagina",
+                });
+            }
         }
     } catch (error) {
         console.log(error);
@@ -71,38 +94,63 @@ phonesController.getPhonesJWT = async (req, res) => {
                 res.sendStatus(403)
             } else {
                 try {
-                    if (req.query.bu && req.query.page) {
-                        const bu = req.query.bu
-                        const page = req.query.page
-                        let elements = 5
-                        let counter = 0
-                        const phones = await phone.find({ businessUnit: bu });
-                        if (req.query.elements) {
-                            elements = req.query.elements
-                            if (parseInt(req.query.elements) > phones.length) {
-                                elements = phone.length
+                    if (req.query.all && req.query.all == "true") {
+                        if (req.query.page) {
+                            const page = req.query.page
+                            let elements = 5
+                            if (req.query.elements) {
+                                elements = req.query.elements
                             }
-                        }
-                        const result = []
-                        let lastPage = 1
-                        if ((Math.round((phones.length) / elements)) > 1) {
-                            lastPage = (Math.round((phones.length) / elements))
-                        }
-                        result.push({ "page": page, "maxObjectsPerPage": parseInt(req.query.elements), "totalObjects": phones.length, "lastPage": lastPage })
-                        for (let index = (parseInt(page) - 1) * parseInt(elements); index < phones.length; index++) {
-                            counter = counter + 1
-                            if (counter > elements) {
-                                break
+                            const phonesCount = await phone.count({});
+                            const result = []
+                            let lastPage = 1
+                            if ((Math.round((phonesCount) / elements)) > 1) {
+                                lastPage = (Math.round((phonesCount) / elements))
                             }
-                            result.push(phones[index])
+                            result.push({ "page": page, "maxObjectsPerPage": parseInt(req.query.elements), "totalObjects": phonesCount, "lastPage": lastPage })
+                            const phones = await phone.find({}).skip((elements * page) - elements).limit(elements);
+                            result.push(phones)
+                            res.status(200).json(result);
+                        } else {
+                            res.status(500).json({
+                                mensaje: "error al obtener paginado",
+                            });
                         }
-                        res.status(200).json(result);
+                    } else {
+                        if (req.query.bu && req.query.page) {
+                            const bu = req.query.bu
+                            const page = req.query.page
+                            let elements = 5
+                            let counter = 0
+                            const phones = await phone.find({ businessUnit: bu });
+                            if (req.query.elements) {
+                                elements = req.query.elements
+                                if (parseInt(req.query.elements) > phones.length) {
+                                    elements = phone.length
+                                }
+                            }
+                            const result = []
+                            let lastPage = 1
+                            if ((Math.round((phones.length) / elements)) > 1) {
+                                lastPage = (Math.round((phones.length) / elements))
+                            }
+                            result.push({ "page": page, "maxObjectsPerPage": parseInt(req.query.elements), "totalObjects": phones.length, "lastPage": lastPage })
+                            for (let index = (parseInt(page) - 1) * parseInt(elements); index < phones.length; index++) {
+                                counter = counter + 1
+                                if (counter > elements) {
+                                    break
+                                }
+                                result.push(phones[index])
+                            }
+                            res.status(200).json(result);
+                        }
+                        else {
+                            res.status(500).json({
+                                mensaje: "error al obtener paginado",
+                            });
+                        }
                     }
-                    else {
-                        res.status(500).json({
-                            mensaje: "error al obtener unidad de negocio o pagina",
-                        });
-                    }
+
                 } catch (error) {
                     console.log(error);
                     res.status(500).json({
