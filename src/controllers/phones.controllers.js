@@ -28,11 +28,7 @@ phonesController.getPhones = async (req, res) => {
                 }
                 const phonesCount = await phone.count({});
                 const result = []
-                let lastPage = 1
-                if ((Math.round((phonesCount) / elements)) > 1) {
-                    lastPage = (Math.round((phonesCount) / elements))
-                }
-                result.push({ "page": page, "maxObjectsPerPage": parseInt(req.query.elements), "totalObjects": phonesCount, "lastPage": lastPage })
+                result.push({ "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": phonesCount })
                 const phones = await phone.find({}).skip((elements * page) - elements).limit(elements);
                 result.push(phones)
                 res.status(200).json(result);
@@ -55,11 +51,8 @@ phonesController.getPhones = async (req, res) => {
                     }
                 }
                 const result = []
-                let lastPage = 1
-                if ((Math.round((phones.length) / elements)) > 1) {
-                    lastPage = (Math.round((phones.length) / elements))
-                }
-                result.push({ "page": page, "maxObjectsPerPage": parseInt(req.query.elements), "totalObjects": phones.length, "lastPage": lastPage })
+
+                result.push({ "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": phones.length })
                 for (let index = (parseInt(page) - 1) * parseInt(elements); index < phones.length; index++) {
                     counter = counter + 1
                     if (counter > elements) {
@@ -103,11 +96,7 @@ phonesController.getPhonesJWT = async (req, res) => {
                             }
                             const phonesCount = await phone.count({});
                             const result = []
-                            let lastPage = 1
-                            if ((Math.round((phonesCount) / elements)) > 1) {
-                                lastPage = (Math.round((phonesCount) / elements))
-                            }
-                            result.push({ "page": page, "maxObjectsPerPage": parseInt(req.query.elements), "totalObjects": phonesCount, "lastPage": lastPage })
+                            result.push({ "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": phonesCount })
                             const phones = await phone.find({}).skip((elements * page) - elements).limit(elements);
                             result.push(phones)
                             res.status(200).json(result);
@@ -130,11 +119,7 @@ phonesController.getPhonesJWT = async (req, res) => {
                                 }
                             }
                             const result = []
-                            let lastPage = 1
-                            if ((Math.round((phones.length) / elements)) > 1) {
-                                lastPage = (Math.round((phones.length) / elements))
-                            }
-                            result.push({ "page": page, "maxObjectsPerPage": parseInt(req.query.elements), "totalObjects": phones.length, "lastPage": lastPage })
+                            result.push({ "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": phones.length })
                             for (let index = (parseInt(page) - 1) * parseInt(elements); index < phones.length; index++) {
                                 counter = counter + 1
                                 if (counter > elements) {
