@@ -246,16 +246,30 @@ phonesController.getPhoneHitsJWT = async (req, res) => {
                 res.sendStatus(403)
             } else {
                 try {
-                    const phones = await phone.find({ enable: true }).sort("hits").limit(1);
-                    if (phones[0] && phones[0].hits) {
-                        if (phones[0].hits >= 5) {
-                            await phone.updateMany({}, { hits: 0 })
+                    if (req.query.bu || req.query.all) {
+                        const bu = req.query.bu
+                        let phones
+                        if (req.query.bu) {
+                            phones = await phone.find({ enable: true, businessUnit: bu }).sort("hits").limit(1);
                         }
-                        //else {
-                        //    await phone.findOneAndUpdate({ number: phones[0].number }, { $inc: { 'hits': 1 } });
-                        //}
+                        if (req.query.all == "true") {
+                            phones = await phone.find({ enable: true }).sort("hits").limit(1);
+                        }
+                        if (phones[0] && phones[0].hits) {
+                            if (phones[0].hits >= 5) {
+                                await phone.updateMany({}, { hits: 0 })
+                            }
+                            //else {
+                            //    await phone.findOneAndUpdate({ number: phones[0].number }, { $inc: { 'hits': 1 } });
+                            //}
+                        }
+                        res.status(200).json(phones);
+                    } else {
+                        res.status(500).json({
+                            mensaje: "error al obtener unidad de negocio",
+                        });
                     }
-                    res.status(200).json(phones);
+
                 } catch (error) {
                     console.log(error);
                     res.status(500).json({
@@ -276,18 +290,31 @@ phonesController.getPhoneHitsJWT = async (req, res) => {
 
 };
 phonesController.getPhoneHits = async (req, res) => {
-    try {
-        const phones = await phone.find({ enable: true }).sort("hits").limit(1);
-        if (phones[0] && phones[0].hits) {
-            if (phones[0].hits >= 5) {
-                await phone.updateMany({}, { hits: 0 })
 
+    try {
+        if (req.query.bu || req.query.all) {
+            const bu = req.query.bu
+            let phones
+            if (req.query.bu) {
+                phones = await phone.find({ enable: true, businessUnit: bu }).sort("hits").limit(1);
             }
-            //else {
-            //    await phone.findOneAndUpdate({ number: phones[0].number }, { $inc: { 'hits': 1 } });
-            //}
+            if (req.query.all == "true") {
+                phones = await phone.find({ enable: true }).sort("hits").limit(1);
+            }
+            if (phones[0] && phones[0].hits) {
+                if (phones[0].hits >= 5) {
+                    await phone.updateMany({}, { hits: 0 })
+                }
+                //else {
+                //    await phone.findOneAndUpdate({ number: phones[0].number }, { $inc: { 'hits': 1 } });
+                //}
+            }
+            res.status(200).json(phones);
+        } else {
+            res.status(500).json({
+                mensaje: "error al obtener unidad de negocio",
+            });
         }
-        res.status(200).json(phones);
     } catch (error) {
         console.log(error);
         res.status(500).json({
