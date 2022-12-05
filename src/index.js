@@ -2,7 +2,6 @@ import request from "request";
 import express from "express";
 import morgan from "morgan";
 import "./database.js";
-import "./controllers/webhook.controllers.js"
 import cors from "cors";
 import message from "./models/messages.models.js";
 import messagesRoutes from "./routes/messages.routes.js"
@@ -13,8 +12,9 @@ import { PORT, whatsappToken } from "./config.js";
 const app = express();
 
 app.post("/webhook", async (req, res) => {
-    console.log("webhook post ", req.body)
+    
     if (req && req.body && req.body.object) {
+        console.log("webhook post ", req.body)
         if (
             req.body.entry &&
             req.body.entry[0].changes &&
