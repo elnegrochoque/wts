@@ -49,7 +49,6 @@ app.post("/webhook", async (req, res) => {
 
 
 app.get("/webhook", (req, res) => {
-    console.log("webhook", req)
     const verify_token = whatsappToken.token;
     let mode = req.query["hub.mode"];
     let token = req.query["hub.verify_token"];
