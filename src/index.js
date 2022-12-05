@@ -12,9 +12,8 @@ import { PORT, whatsappToken } from "./config.js";
 const app = express();
 app.listen(PORT.PORT, () => console.log("webhook is listening"));
 app.post("/webhook", async (req, res) => {
-    
-    if (req && req.body && req.body.object) {
-        console.log("webhook post ", req.body)
+    let body = req.body;
+    if (req.body.object) {
         if (
             req.body.entry &&
             req.body.entry[0].changes &&
@@ -22,9 +21,12 @@ app.post("/webhook", async (req, res) => {
             req.body.entry[0].changes[0].value.messages &&
             req.body.entry[0].changes[0].value.messages[0]
         ) {
-
-            console.log("json", JSON.stringify(req.body, null, 2));
-
+            console.log("te escribieron")
+            //console.log(req.body.entry[0].changes[0].value.messages[0])
+            console.log(req.body.entry[0].changes[0].value.messages[0].text.body)
+            console.log(req.body.entry[0].changes[0].value.messages[0].from)
+            console.log(req.body.entry[0].changes[0].value.metadata.display_phone_number)
+            let phone_number_id = req.body.entry[0].changes[0].value.metadata.phone_number_id;
             try {
                 const to = req.body.entry[0].changes[0].value.metadata.display_phone_number
                 await phone.findOneAndUpdate({ number: to }, { $inc: { 'hits': 1 } });
@@ -37,18 +39,13 @@ app.post("/webhook", async (req, res) => {
             } catch (error) {
                 console.log(error)
             }
-            //console.log(req.body.entry[0].changes[0].value.messages[0])
-            //console.log(req.body.entry[0].changes[0].value.messages[0].text.body)
-            //let phone_number_id = req.body.entry[0].changes[0].value.metadata.phone_number_id;
-            //let from = req.body.entry[0].changes[0].value.messages[0].from; // extract the phone number from the webhook payload
-            //let msg_body = req.body.entry[0].changes[0].value.messages[0].text.body; // extract the message text from the webhook payload
         }
         res.sendStatus(200);
     } else {
-        // Return a '404 Not Found' if event is not from a WhatsApp API
         res.sendStatus(404);
     }
 });
+
 
 
 app.get("/webhook", (req, res) => {
