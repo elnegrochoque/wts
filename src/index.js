@@ -12,8 +12,7 @@ import { PORT, whatsappToken } from "./config.js";
 const app = express();
 
 app.post("/webhook", async (req, res) => {
-
-    console.log("json", JSON.stringify(req.body, null, 2));
+    console.log(req)
     if (req && req.body && req.body.object) {
         if (
             req.body.entry &&
@@ -23,10 +22,11 @@ app.post("/webhook", async (req, res) => {
             req.body.entry[0].changes[0].value.messages[0]
         ) {
 
+            console.log("json", JSON.stringify(req.body, null, 2));
 
             try {
-                const to= req.body.entry[0].changes[0].value.metadata.display_phone_number
-                await phone.findOneAndUpdate({ number: to }, {$inc : {'hits' : 1}});
+                const to = req.body.entry[0].changes[0].value.metadata.display_phone_number
+                await phone.findOneAndUpdate({ number: to }, { $inc: { 'hits': 1 } });
                 const newMessage = new message({
                     message: req.body.entry[0].changes[0].value.messages[0].text.body,
                     from: req.body.entry[0].changes[0].value.messages[0].from,
@@ -64,8 +64,8 @@ app.get("/webhook", (req, res) => {
             res.sendStatus(403);
         }
     }
-});  
-app.listen( PORT.PORT , () => console.log("webhook is listening"));
+});
+app.listen(PORT.PORT, () => console.log("webhook is listening"));
 app.use(morgan("dev"));
 app.use(cors());
 app.use(express.json());
