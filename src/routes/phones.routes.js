@@ -16,7 +16,7 @@ if (JWTFlag.JWTFlag === true || OwnJWT.Flag === true) {
         .get(phonesController.getPhoneJWT)
         .put(phonesController.putPhoneByIdJWT)
     router.route('/phoneshits')
-        .get(phonesController.getPhoneHitsJWT)
+        .get(phonesController.getPhoneHits)
 
 
 
