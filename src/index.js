@@ -9,7 +9,6 @@ import messagesRoutes from "./routes/messages.routes.js"
 import phonesRoutes from "./routes/phones.routes.js"
 import jwtRoutes from "./routes/jwt.routes.js"
 import { PORT, whatsappToken } from "./config.js";
-import express from "express";
 import message from "../models/messages.models.js";
 const app = express();
 
