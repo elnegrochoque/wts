@@ -9,10 +9,11 @@ import messagesRoutes from "./routes/messages.routes.js"
 import phonesRoutes from "./routes/phones.routes.js"
 import jwtRoutes from "./routes/jwt.routes.js"
 import { PORT, whatsappToken } from "./config.js";
+
 const app = express();
 
 app.post("/webhook", async (req, res) => {
-    console.log(req.body)
+    console.log("webhook post ", req.body)
     if (req && req.body && req.body.object) {
         if (
             req.body.entry &&
@@ -51,8 +52,8 @@ app.post("/webhook", async (req, res) => {
 
 
 app.get("/webhook", (req, res) => {
-    console.log(req)
-    const verify_token = process.env.VERIFY_TOKEN;
+    console.log("webhook", req)
+    const verify_token = whatsappToken;
     let mode = req.query["hub.mode"];
     let token = req.query["hub.verify_token"];
     let challenge = req.query["hub.challenge"];
