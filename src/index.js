@@ -12,8 +12,7 @@ import { PORT, whatsappToken } from "./config.js";
 const app = express();
 app.listen(PORT.PORT, () => console.log("webhook is listening"));
 app.post("/webhook", async (req, res) => {
-    let body = req.body;
-    if (req.body.object) {
+    if (req && req.body && req.body.object) {
         if (
             req.body.entry &&
             req.body.entry[0].changes &&
