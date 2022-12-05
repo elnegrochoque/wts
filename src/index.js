@@ -12,7 +12,7 @@ import { PORT, whatsappToken } from "./config.js";
 const app = express();
 
 app.post("/webhook", async (req, res) => {
-    console.log(req)
+    console.log(req.body)
     if (req && req.body && req.body.object) {
         if (
             req.body.entry &&
