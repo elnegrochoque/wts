@@ -10,7 +10,12 @@ import jwtRoutes from "./routes/jwt.routes.js"
 import { PORT, whatsappToken } from "./config.js";
 
 const app = express();
+
+app.use(morgan("dev"));
+app.use(cors());
+app.use(express.json());
 app.listen(PORT.PORT, () => console.log("webhook is listening"));
+
 app.post("/webhook", async (req, res) => {
     if (req && req.body && req.body.object) {
         if (
@@ -62,9 +67,6 @@ app.get("/webhook", (req, res) => {
     }
 });
 
-app.use(morgan("dev"));
-app.use(cors());
-app.use(express.json());
 
 
 app.use("/api", messagesRoutes);
