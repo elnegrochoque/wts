@@ -14,7 +14,7 @@ const app = express();
 app.post("/webhook", async (req, res) => {
 
     console.log("json", JSON.stringify(req.body, null, 2));
-    if (req.body.object) {
+    if (req && req.body && req.body.object) {
         if (
             req.body.entry &&
             req.body.entry[0].changes &&
