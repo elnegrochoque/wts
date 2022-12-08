@@ -26,12 +26,6 @@ app.post("/webhook", async (req, res) => {
             req.body.entry[0].changes[0].value.messages &&
             req.body.entry[0].changes[0].value.messages[0]
         ) {
-            console.log("te escribieron")
-            //console.log(req.body.entry[0].changes[0].value.messages[0])
-            console.log(req.body.entry[0].changes[0].value.messages[0].text.body)
-            console.log(req.body.entry[0].changes[0].value.messages[0].from)
-            console.log(req.body.entry[0].changes[0].value.metadata.display_phone_number)
-            let phone_number_id = req.body.entry[0].changes[0].value.metadata.phone_number_id;
             try {
                 const to = req.body.entry[0].changes[0].value.metadata.display_phone_number
                 await phone.findOneAndUpdate({ number: to }, { $inc: { 'hits': 1 } });

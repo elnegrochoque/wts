@@ -491,7 +491,6 @@ phonesController.deletePhoneJWT = async (req, res) => {
                 try {
                     const { oldNumber } = req.body;
                     const deletePhone = await phone.deleteOne({ phoneNumber: oldNumber });
-                    console.log(deletePhone)
                     if (deletePhone.deletedCount > 0) {
                         res.status(201).json({
                             mensaje: "Teléfono eliminado",
