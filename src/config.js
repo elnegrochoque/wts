@@ -19,8 +19,6 @@ export const JWTFlag = {
 }
 export const OwnJWT = {
     Flag: true,
-    user: "admin",
-    password: "admin",
     jwtkey: "jwt-key",
     expires: "1d"
 }
