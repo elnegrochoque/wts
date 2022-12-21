@@ -4,7 +4,8 @@ const messageSchema = new Schema(
     {
         message: String,
         from: String,
-        to: String
+        to: String,
+        whatsappBussinessId: String
     }, { timestamps: true }
 
 );

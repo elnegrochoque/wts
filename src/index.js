@@ -9,6 +9,7 @@ import phonesRoutes from "./routes/phones.routes.js"
 import jwtRoutes from "./routes/jwt.routes.js"
 import { PORT, whatsappToken } from "./config.js";
 import phone from "./models/phones.models.js";
+import userRoutes from "./routes/users.routes.js"
 
 const app = express();
 
@@ -32,7 +33,8 @@ app.post("/webhook", async (req, res) => {
                 const newMessage = new message({
                     message: req.body.entry[0].changes[0].value.messages[0].text.body,
                     from: req.body.entry[0].changes[0].value.messages[0].from,
-                    to: to
+                    to: to,
+                    whatsappBussinessId: req.body.entry[0].id
                 })
                 await newMessage.save()
             } catch (error) {
@@ -67,3 +69,4 @@ app.get("/webhook", (req, res) => {
 app.use("/api", messagesRoutes);
 app.use("/api", phonesRoutes);
 app.use("/api", jwtRoutes)
+app.use("/api", userRoutes)

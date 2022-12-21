@@ -2,18 +2,25 @@ import fs from "fs"
 import { JWTFlag, OwnJWT } from "../config.js";
 import jwt from "jsonwebtoken";
 import jwt_decode from "jwt-decode";
+import user from "../models/users.models.js";
 const authJWT = {};
 
 export const permissionJWTVerify = async (token, permission) => {
-    let flagPermission = false
+    let flagPermission = { "flag": false, "user": null }
     try {
         if (JWTFlag.JWTFlag === false && OwnJWT.Flag === true) {
             jwt.verify(token, OwnJWT.jwtkey, async (error, authData) => {
-                if (error) {
+                try {
+                    const decoded = jwt_decode(token);
+                    if (error) {
+                        console.log(error)
+                    } else {
+                        flagPermission = { "flag": true, "user": decoded }
+                    }
+                } catch (error) {
                     console.log(error)
-                } else {
-                    flagPermission = true
                 }
+
             })
         } else {
             const publicKey = fs.readFileSync('./src/' + JWTFlag.jwtKeyFileName)
@@ -42,8 +49,12 @@ export const permissionJWTVerify = async (token, permission) => {
 }
 authJWT.signJWT = async (req, res) => {
     try {
-        if (req.body.user == OwnJWT.user && req.body.password == OwnJWT.password) {
-            jwt.sign({ user: { user: OwnJWT.user, password: OwnJWT.password } }, OwnJWT.jwtkey, { expiresIn: OwnJWT.expires }, (err, token) => {
+        const userName = req.body.user
+        const password = req.body.password
+        const userFind = await user.findOne({ user: userName, password: password })
+        if (userFind !== null) {
+            console.log("hola")
+            jwt.sign({ user: userFind }, OwnJWT.jwtkey, { expiresIn: OwnJWT.expires }, (err, token) => {
                 res.json({ token })
             })
         } else {
@@ -53,5 +64,7 @@ authJWT.signJWT = async (req, res) => {
         console.log(error)
     }
 }
+
+
 
 export default authJWT;

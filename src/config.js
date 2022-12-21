@@ -3,11 +3,11 @@ export const mongoConf = {
     dbName: "apiwhatsapp"
 }
 export const whatsappToken = {
-    token: "prueba1234",
-    messageToken:"EAAOTTeeRA1IBAP3ef65R8T1CzIhnBZBZBK3ys7o17Wis8flDxmCCYBZBc5VPmBiwtHkKXH0ajC1Vu8nsy1PYZCHRqeWtWvgVPY6kK5HRgoWrtmllvN6UDwefy7ZBTrdLr9IZCUMRBNiOCatedqp9rHZAx5U0tUD9V0kECBdrZApOzw2QZCyXSKSzk",
-    bussinesAccountId:"104140005848532"
+    token: "prueba1234"
 }
-
+export const urlMeta = {
+    url: "https://graph.facebook.com/v15.0/"
+}
 export const PORT = {
     PORT: 4000
 }
@@ -22,5 +22,5 @@ export const OwnJWT = {
     user: "admin",
     password: "admin",
     jwtkey: "jwt-key",
-    expires: "1h"
+    expires: "1d"
 }

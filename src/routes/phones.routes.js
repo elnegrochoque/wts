@@ -9,8 +9,6 @@ if (JWTFlag.JWTFlag === true || OwnJWT.Flag === true) {
     router.route('/phones')
         .post(phonesController.postCreatePhoneJWT)
         .get(phonesController.getPhonesJWT)
-        .delete(phonesController.deletePhoneJWT)
-        .put(phonesController.putPhoneJWT)
     router.route('/phones/:id')
         .delete(phonesController.deletePhoneByIdJWT)
         .get(phonesController.getPhoneJWT)

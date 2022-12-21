@@ -7,7 +7,8 @@ const phoneSchema = new Schema(
         email: String,
         hits: Number,
         enable : Boolean,
-        businessUnit: String
+        businessUnit: String,
+        bussinesAccountId: { type: String, required: true}
     }, { timestamps: true }
 
 );
