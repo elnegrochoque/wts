@@ -67,6 +67,15 @@ messagesController.getMessageJWT = async (req, res) => {
                 if (permission.user.user.permisions.find(permissionsAux => permissionsAux === 'admin')) {
                     if (req.query.page) {
                         const page = req.query.page
+                        if (req.query.number) {
+                            console.log(req.query.number)
+                            const messageCount = await message.count({ $or: [{ from: { $regex: req.query.number }, whatsappBussinessId: permission.user.user.bussinesAccountId }, { to: { $regex: req.query.number }, whatsappBussinessId: permission.user.user.bussinesAccountId }] });
+                            const result = []
+                            result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": messageCount } })
+                            const messages = await message.find({ $or: [{ from: { $regex: req.query.number }, whatsappBussinessId: permission.user.user.bussinesAccountId }, { to: { $regex: req.query.number }, whatsappBussinessId: permission.user.user.bussinesAccountId }] }).skip((elements * page) - elements).limit(elements);
+                            result.push({ messages: messages })
+                            res.status(200).json(result);
+                        }
                         if (req.query.from) {
                             const messageCount = await message.count({ from: req.query.from });
                             const result = []
@@ -94,12 +103,12 @@ messagesController.getMessageJWT = async (req, res) => {
                         if (req.query.date == "true" && req.query.start && typeof req.query.start == "string" && req.query.end && typeof req.query.end == "string") {
                             const startAux = req.query.start.split("-")
                             const endAux = req.query.end.split("-")
-                            const start = new Date(startAux[2], startAux[1] - 1, startAux[0]) 
-                            const end = new Date(endAux[2], endAux[1] - 1, endAux[0]) 
-                            const messageCount = await message.count({  createdAt: { $gte: start, $lt: end } });
+                            const start = new Date(startAux[2], startAux[1] - 1, startAux[0])
+                            const end = new Date(endAux[2], endAux[1] - 1, endAux[0])
+                            const messageCount = await message.count({ createdAt: { $gte: start, $lt: end } });
                             const result = []
                             result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": messageCount } })
-                            const messages = await message.find({  createdAt: { $gte: start, $lt: end } }).skip((elements * page) - elements).limit(elements);
+                            const messages = await message.find({ createdAt: { $gte: start, $lt: end } }).skip((elements * page) - elements).limit(elements);
                             result.push({ messages: messages })
                             res.status(200).json(result);
                         } else {
@@ -115,6 +124,15 @@ messagesController.getMessageJWT = async (req, res) => {
                 } else {
                     if (req.query.page) {
                         const page = req.query.page
+                        if (req.query.number) {
+                            console.log(req.query.number)
+                            const messageCount = await message.count({ $or: [{ from: { $regex: req.query.number }, whatsappBussinessId: permission.user.user.bussinesAccountId }, { to: { $regex: req.query.number }, whatsappBussinessId: permission.user.user.bussinesAccountId }] });
+                            const result = []
+                            result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": messageCount } })
+                            const messages = await message.find({ $or: [{ from: { $regex: req.query.number }, whatsappBussinessId: permission.user.user.bussinesAccountId }, { to: { $regex: req.query.number }, whatsappBussinessId: permission.user.user.bussinesAccountId }] }).skip((elements * page) - elements).limit(elements);
+                            result.push({ messages: messages })
+                            res.status(200).json(result);
+                        }
                         if (req.query.from) {
                             const messageCount = await message.count({ from: req.query.from, whatsappBussinessId: permission.user.user.bussinesAccountId });
                             const result = []
@@ -142,18 +160,14 @@ messagesController.getMessageJWT = async (req, res) => {
                         if (req.query.date == "true" && req.query.start && typeof req.query.start == "string" && req.query.end && typeof req.query.end == "string") {
                             const startAux = req.query.start.split("-")
                             const endAux = req.query.end.split("-")
-                            const start = new Date(startAux[2], startAux[1] - 1, startAux[0]) 
-                            const end = new Date(endAux[2], endAux[1] - 1, endAux[0]) 
+                            const start = new Date(startAux[2], startAux[1] - 1, startAux[0])
+                            const end = new Date(endAux[2], endAux[1] - 1, endAux[0])
                             const messageCount = await message.count({ whatsappBussinessId: permission.user.user.bussinesAccountId, createdAt: { $gte: start, $lt: end } });
                             const result = []
                             result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": messageCount } })
                             const messages = await message.find({ whatsappBussinessId: permission.user.user.bussinesAccountId, createdAt: { $gte: start, $lt: end } }).skip((elements * page) - elements).limit(elements);
                             result.push({ messages: messages })
                             res.status(200).json(result);
-                        } else {
-                            res.status(500).json({
-                                mensaje: "error al obtener informacion",
-                            });
                         }
                     } else {
                         res.status(500).json({
