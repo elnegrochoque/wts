@@ -1,11 +1,11 @@
 import Router from "express";
 import phonesController from "../controllers/phones.controllers.js";
 
-import { JWTFlag, OwnJWT } from "../config.js";
+import {OwnJWT } from "../config.js";
 const router = Router();
 
 
-if (JWTFlag.JWTFlag === true || OwnJWT.Flag === true) {
+if (OwnJWT.Flag === true) {
     router.route('/phones')
         .post(phonesController.postCreatePhoneJWT)
         .get(phonesController.getPhonesJWT)

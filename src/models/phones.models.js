@@ -2,13 +2,15 @@ import mongoose, { Schema } from "mongoose";
 
 const phoneSchema = new Schema(
     {
-        phoneNumber: { type: String, unique: true, required: true},
+        phoneNumber: { type: String, unique: true, required: true },
         name: String,
         email: String,
         hits: Number,
-        enable : Boolean,
+        enable: Boolean,
         businessUnit: String,
-        bussinesAccountId: { type: String, required: true}
+        bussinesAccountId: { type: String, required: true },
+        messages: Number,
+        tiendaid: String
     }, { timestamps: true }
 
 );

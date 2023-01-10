@@ -1,6 +1,3 @@
-
-
-import { JWTFlag } from "../config.js";
 import phone from "../models/phones.models.js";
 import { permissionJWTVerify } from "./jwt.controllers.js";
 const phonesController = {};
@@ -82,7 +79,7 @@ phonesController.getPhonesJWT = async (req, res) => {
         if (typeof baererHeader !== 'undefined') {
             const baererToken = baererHeader.split(" ")[1]
             req.token = baererToken;
-            const permission = await permissionJWTVerify(baererToken, JWTFlag.permissionNameView)
+            const permission = await permissionJWTVerify(baererToken)
             if (permission.flag == false) {
                 res.sendStatus(403)
             } else {
@@ -107,28 +104,86 @@ phonesController.getPhonesJWT = async (req, res) => {
                         }
                     } else {
                         if (permission.user.user.permisions.find(permissionsAux => permissionsAux === 'view') || permission.user.user.permisions.find(permissionsAux => permissionsAux === 'admin')) {
-                            if (req.query.bu && req.query.page) {
-                                const bu = req.query.bu
+                            let elements = 5
+                            if (req.query.elements) {
+                                elements = req.query.elements
+                            }
+                            if (req.query.page) {
                                 const page = req.query.page
-                                let elements = 5
-                                if (req.query.elements) {
-                                    elements = req.query.elements
+                                if (req.query.bu) {
+                                    const bu = req.query.bu
+                                    if (permission.user.user.permisions.find(permissionsAux => permissionsAux === 'admin')) {
+                                        const phonesCount = await phone.count({ businessUnit: bu });
+                                        const phones = await phone.find({ businessUnit: bu });
+                                        const result = []
+                                        result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": phonesCount } })
+                                        result.push({ phones: phones })
+                                        res.status(200).json(result);
+                                    } else {
+                                        const phonesCount = await phone.count({ businessUnit: bu, bussinesAccountId: permission.user.user.bussinesAccountId });
+                                        const phones = await phone.find({ businessUnit: bu, bussinesAccountId: permission.user.user.bussinesAccountId });
+                                        const result = []
+                                        result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": phonesCount } })
+                                        result.push({ phones: phones })
+                                        res.status(200).json(result);
+                                    }
                                 }
-                                if (permission.user.user.permisions.find(permissionsAux => permissionsAux === 'admin')) {
-                                    const phonesCount = await phone.count({ businessUnit: bu });
-                                    const phones = await phone.find({ businessUnit: bu });
-                                    const result = []
-                                    result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": phonesCount } })
-                                    result.push({ phones: phones })
-                                    res.status(200).json(result);
-                                } else {
-                                    const phonesCount = await phone.count({ businessUnit: bu, bussinesAccountId: permission.user.user.bussinesAccountId });
-                                    const phones = await phone.find({ businessUnit: bu, bussinesAccountId: permission.user.user.bussinesAccountId });
-                                    const result = []
-                                    result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": phonesCount } })
-                                    result.push({ phones: phones })
-                                    res.status(200).json(result);
+                                if (req.query.name) {
+                                    const name = req.query.name
+                                    if (permission.user.user.permisions.find(permissionsAux => permissionsAux === 'admin')) {
+                                        const phonesCount = await phone.count({ name: name });
+                                        const phones = await phone.find({ name: name });
+                                        const result = []
+                                        result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": phonesCount } })
+                                        result.push({ phones: phones })
+                                        res.status(200).json(result);
+                                    } else {
+                                        const phonesCount = await phone.count({ name: name, bussinesAccountId: permission.user.user.bussinesAccountId });
+                                        const phones = await phone.find({ name: name, bussinesAccountId: permission.user.user.bussinesAccountId });
+                                        const result = []
+                                        result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": phonesCount } })
+                                        result.push({ phones: phones })
+                                        res.status(200).json(result);
+                                    }
                                 }
+
+                                if (req.query.email) {
+                                    const email = req.query.email
+                                    if (permission.user.user.permisions.find(permissionsAux => permissionsAux === 'admin')) {
+                                        const phonesCount = await phone.count({ email: email });
+                                        const phones = await phone.find({ email: email });
+                                        const result = []
+                                        result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": phonesCount } })
+                                        result.push({ phones: phones })
+                                        res.status(200).json(result);
+                                    } else {
+                                        const phonesCount = await phone.count({ email: email, bussinesAccountId: permission.user.user.bussinesAccountId });
+                                        const phones = await phone.find({ email: email, bussinesAccountId: permission.user.user.bussinesAccountId });
+                                        const result = []
+                                        result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": phonesCount } })
+                                        result.push({ phones: phones })
+                                        res.status(200).json(result);
+                                    }
+                                }
+                                if (req.query.phoneNumber) {
+                                    const phoneNumber = req.query.phoneNumber
+                                    if (permission.user.user.permisions.find(permissionsAux => permissionsAux === 'admin')) {
+                                        const phonesCount = await phone.count({ phoneNumber: phoneNumber });
+                                        const phones = await phone.find({ phoneNumber: phoneNumber });
+                                        const result = []
+                                        result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": phonesCount } })
+                                        result.push({ phones: phones })
+                                        res.status(200).json(result);
+                                    } else {
+                                        const phonesCount = await phone.count({ phoneNumber: phoneNumber, bussinesAccountId: permission.user.user.bussinesAccountId });
+                                        const phones = await phone.find({ phoneNumber: phoneNumber, bussinesAccountId: permission.user.user.bussinesAccountId });
+                                        const result = []
+                                        result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": phonesCount } })
+                                        result.push({ phones: phones })
+                                        res.status(200).json(result);
+                                    }
+                                }
+
                             }
                             else {
                                 res.status(500).json({
@@ -171,7 +226,8 @@ phonesController.postCreatePhone = async (req, res) => {
             phoneNumber: phoneNumber,
             enable: false,
             hits: 0,
-            user: user
+            user: user,
+            messages: 0
         });
         await newPhone.save();
         res.status(201).json({
@@ -197,7 +253,7 @@ phonesController.postCreatePhoneJWT = async (req, res) => {
         if (typeof baererHeader !== 'undefined') {
             const baererToken = baererHeader.split(" ")[1]
             req.token = baererToken;
-            const permission = await permissionJWTVerify(baererToken, JWTFlag.permissionNameEdit)
+            const permission = await permissionJWTVerify(baererToken)
             if (permission.flag == false || (
                 permission.user.user.permisions.find(permissionsAux => permissionsAux === 'admin') == undefined &&
                 permission.user.user.permisions.find(permissionsAux => permissionsAux === 'create') == undefined)) {
@@ -213,7 +269,8 @@ phonesController.postCreatePhoneJWT = async (req, res) => {
                             phoneNumber: phoneNumber,
                             enable: false,
                             hits: 0,
-                            bussinesAccountId: bussinesAccountId
+                            bussinesAccountId: bussinesAccountId,
+                            messages: 0
                         });
                         await newPhone.save();
                         res.status(201).json({
@@ -228,7 +285,8 @@ phonesController.postCreatePhoneJWT = async (req, res) => {
                             phoneNumber: phoneNumber,
                             enable: false,
                             hits: 0,
-                            bussinesAccountId: permission.user.user.bussinesAccountId
+                            bussinesAccountId: permission.user.user.bussinesAccountId,
+                            messages: 0
                         });
                         await newPhone.save();
                         res.status(201).json({
@@ -266,7 +324,7 @@ phonesController.getPhoneHitsJWT = async (req, res) => {
         if (typeof baererHeader !== 'undefined') {
             const baererToken = baererHeader.split(" ")[1]
             req.token = baererToken;
-            const permission = await permissionJWTVerify(baererToken, JWTFlag.permissionNameView)
+            const permission = await permissionJWTVerify(baererToken)
             if (permission.flag == false) {
                 res.sendStatus(403)
             } else {
@@ -383,7 +441,7 @@ phonesController.putPhoneJWT = async (req, res) => {
         if (typeof baererHeader !== 'undefined') {
             const baererToken = baererHeader.split(" ")[1]
             req.token = baererToken;
-            const permission = await permissionJWTVerify(baererToken, JWTFlag.permissionNameEdit)
+            const permission = await permissionJWTVerify(baererToken)
             if (permission.flag == false || (
                 permission.user.user.permisions.find(permissionsAux => permissionsAux === 'admin') == undefined &&
                 permission.user.user.permisions.find(permissionsAux => permissionsAux === 'edit') == undefined)) {
@@ -464,7 +522,7 @@ phonesController.putPhoneByIdJWT = async (req, res) => {
         if (typeof baererHeader !== 'undefined') {
             const baererToken = baererHeader.split(" ")[1]
             req.token = baererToken;
-            const permission = await permissionJWTVerify(baererToken, JWTFlag.permissionNameEdit)
+            const permission = await permissionJWTVerify(baererToken)
             if (permission.flag == false || (
                 permission.user.user.permisions.find(permissionsAux => permissionsAux === 'admin') == undefined &&
                 permission.user.user.permisions.find(permissionsAux => permissionsAux === 'edit') == undefined)) {
@@ -537,7 +595,7 @@ phonesController.deletePhoneJWT = async (req, res) => {
         if (typeof baererHeader !== 'undefined') {
             const baererToken = baererHeader.split(" ")[1]
             req.token = baererToken;
-            const permission = await permissionJWTVerify(baererToken, JWTFlag.permissionNameEdit)
+            const permission = await permissionJWTVerify(baererToken)
             if (permission.flag == false) {
                 res.sendStatus(403)
             } else {
@@ -598,7 +656,7 @@ phonesController.deletePhoneByIdJWT = async (req, res) => {
         if (typeof baererHeader !== 'undefined') {
             const baererToken = baererHeader.split(" ")[1]
             req.token = baererToken;
-            const permission = await permissionJWTVerify(baererToken, JWTFlag.permissionNameEdit)
+            const permission = await permissionJWTVerify(baererToken)
             if (permission.flag == false || (
                 permission.user.user.permisions.find(permissionsAux => permissionsAux === 'admin') == undefined &&
                 permission.user.user.permisions.find(permissionsAux => permissionsAux === 'edit') == undefined)) {
@@ -683,7 +741,7 @@ phonesController.getPhoneJWT = async (req, res) => {
         if (typeof baererHeader !== 'undefined') {
             const baererToken = baererHeader.split(" ")[1]
             req.token = baererToken;
-            const permission = await permissionJWTVerify(baererToken, JWTFlag.permissionNameView)
+            const permission = await permissionJWTVerify(baererToken)
             if (permission.flag == false || (
                 permission.user.user.permisions.find(permissionsAux => permissionsAux === 'admin') == undefined &&
                 permission.user.user.permisions.find(permissionsAux => permissionsAux === 'view') == undefined)) {
@@ -696,7 +754,7 @@ phonesController.getPhoneJWT = async (req, res) => {
                         res.status(200).json(objectPhone);
                     } else {
                         const id = req.params.id
-                        const objectPhone = await phone.find({_id: id, bussinesAccountId: permission.user.user.bussinesAccountId});
+                        const objectPhone = await phone.find({ _id: id, bussinesAccountId: permission.user.user.bussinesAccountId });
                         res.status(200).json(objectPhone);
                     }
                 } catch (error) {

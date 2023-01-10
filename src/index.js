@@ -1,4 +1,4 @@
-import request from "request";
+
 import express from "express";
 import morgan from "morgan";
 import "./database.js";
@@ -6,10 +6,8 @@ import cors from "cors";
 import message from "./models/messages.models.js";
 import messagesRoutes from "./routes/messages.routes.js"
 import phonesRoutes from "./routes/phones.routes.js"
-import jwtRoutes from "./routes/jwt.routes.js"
 import { PORT, whatsappToken } from "./config.js";
 import phone from "./models/phones.models.js";
-import userRoutes from "./routes/users.routes.js"
 
 const app = express();
 
@@ -68,5 +66,3 @@ app.get("/webhook", (req, res) => {
 
 app.use("/api", messagesRoutes);
 app.use("/api", phonesRoutes);
-app.use("/api", jwtRoutes)
-app.use("/api", userRoutes)

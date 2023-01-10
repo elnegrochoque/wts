@@ -1,16 +1,11 @@
 
 import message from "../models/messages.models.js";
-import {  urlMeta  } from "../config.js";
+import { urlMeta } from "../config.js";
 import axios from "axios";
 import { permissionJWTVerify } from "./jwt.controllers.js";
-import { JWTFlag } from "../config.js";
+import phone from "../models/phones.models.js";
 
 const messagesController = {};
-function unixTimestamp() {
-    return Math.floor(
-        Date.now() / 1000
-    )
-}
 
 
 const getPhoneNumberWhitID = async (phoneNumber, bussinesAccountId, messageToken) => {
@@ -58,7 +53,7 @@ messagesController.getMessageJWT = async (req, res) => {
     if (typeof baererHeader !== 'undefined') {
         const baererToken = baererHeader.split(" ")[1]
         req.token = baererToken;
-        const permission = await permissionJWTVerify(baererToken, JWTFlag.permissionNameEdit)
+        const permission = await permissionJWTVerify(baererToken)
         if (permission.flag == false || (
             permission.user.user.permisions.find(permissionsAux => permissionsAux === 'admin') == undefined &&
             permission.user.user.permisions.find(permissionsAux => permissionsAux === 'view') == undefined)) {
@@ -96,6 +91,22 @@ messagesController.getMessageJWT = async (req, res) => {
                             result.push({ messages: messages })
                             res.status(200).json(result);
                         }
+                        if (req.query.date == "true" && req.query.start && typeof req.query.start == "string" && req.query.end && typeof req.query.end == "string") {
+                            const startAux = req.query.start.split("-")
+                            const endAux = req.query.end.split("-")
+                            const start = new Date(startAux[2], startAux[1] - 1, startAux[0]) 
+                            const end = new Date(endAux[2], endAux[1] - 1, endAux[0]) 
+                            const messageCount = await message.count({  createdAt: { $gte: start, $lt: end } });
+                            const result = []
+                            result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": messageCount } })
+                            const messages = await message.find({  createdAt: { $gte: start, $lt: end } }).skip((elements * page) - elements).limit(elements);
+                            result.push({ messages: messages })
+                            res.status(200).json(result);
+                        } else {
+                            res.status(500).json({
+                                mensaje: "error al obtener informacion",
+                            });
+                        }
                     } else {
                         res.status(500).json({
                             mensaje: "error al obtener informacion",
@@ -127,6 +138,22 @@ messagesController.getMessageJWT = async (req, res) => {
                             const messages = await message.find({ whatsappBussinessId: permission.user.user.bussinesAccountId }).skip((elements * page) - elements).limit(elements);
                             result.push({ messages: messages })
                             res.status(200).json(result);
+                        }
+                        if (req.query.date == "true" && req.query.start && typeof req.query.start == "string" && req.query.end && typeof req.query.end == "string") {
+                            const startAux = req.query.start.split("-")
+                            const endAux = req.query.end.split("-")
+                            const start = new Date(startAux[2], startAux[1] - 1, startAux[0]) 
+                            const end = new Date(endAux[2], endAux[1] - 1, endAux[0]) 
+                            const messageCount = await message.count({ whatsappBussinessId: permission.user.user.bussinesAccountId, createdAt: { $gte: start, $lt: end } });
+                            const result = []
+                            result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": messageCount } })
+                            const messages = await message.find({ whatsappBussinessId: permission.user.user.bussinesAccountId, createdAt: { $gte: start, $lt: end } }).skip((elements * page) - elements).limit(elements);
+                            result.push({ messages: messages })
+                            res.status(200).json(result);
+                        } else {
+                            res.status(500).json({
+                                mensaje: "error al obtener informacion",
+                            });
                         }
                     } else {
                         res.status(500).json({
@@ -179,6 +206,7 @@ messagesController.getMessage = async (req, res) => {
                 result.push({ messages: messages })
                 res.status(200).json(result);
             }
+
         } else {
             res.status(500).json({
                 mensaje: "error al obtener informacion",
@@ -197,7 +225,7 @@ messagesController.postTextMessageJWT = async (req, res) => {
     if (typeof baererHeader !== 'undefined') {
         const baererToken = baererHeader.split(" ")[1]
         req.token = baererToken;
-        const permission = await permissionJWTVerify(baererToken, JWTFlag.permissionNameEdit)
+        const permission = await permissionJWTVerify(baererToken)
         if (permission.flag == false) {
             res.sendStatus(403)
         } else {
@@ -225,8 +253,17 @@ messagesController.postTextMessageJWT = async (req, res) => {
                             data: data
                         };
                         axios(config)
-                            .then(function (response) {
+                            .then(async function (response) {
+                                await phone.findOneAndUpdate({ number: req.body.from }, { $inc: { 'messages': 1 } });
+                                const newMessage = new message({
+                                    message: req.body.text,
+                                    from: req.body.from,
+                                    to: req.body.to,
+                                    whatsappBussinessId: permission.user.user.bussinesAccountId
+                                })
+                                await newMessage.save()
                                 res.status(200).json({ mensaje: "enviado" });
+
                             })
                             .catch(function (error) {
                                 res.status(500).json({
@@ -281,8 +318,9 @@ messagesController.postTextMessage = async (req, res) => {
                     data: data
                 };
                 axios(config)
-                    .then(function (response) {
+                    .then(async function (response) {
                         res.status(200).json({ mensaje: "enviado" });
+                        await phone.findOneAndUpdate({ number: req.body.from }, { $inc: { 'messages': 1 } });
                     })
                     .catch(function (error) {
                         res.status(500).json({
@@ -314,7 +352,7 @@ messagesController.postLocationMessageJWT = async (req, res) => {
     if (typeof baererHeader !== 'undefined') {
         const baererToken = baererHeader.split(" ")[1]
         req.token = baererToken;
-        const permission = await permissionJWTVerify(baererToken, JWTFlag.permissionNameEdit)
+        const permission = await permissionJWTVerify(baererToken)
         if (permission.flag == false) {
             res.sendStatus(403)
         } else {
@@ -343,8 +381,9 @@ messagesController.postLocationMessageJWT = async (req, res) => {
                             data: data
                         };
                         axios(config)
-                            .then(function (response) {
+                            .then(async function (response) {
                                 res.status(200).json({ mensaje: "enviado" });
+                                await phone.findOneAndUpdate({ number: req.body.from }, { $inc: { 'messages': 1 } });
                             })
                             .catch(function (error) {
                                 console.log(error);
@@ -374,6 +413,12 @@ messagesController.postLocationMessageJWT = async (req, res) => {
 messagesController.postLocationMessage = async (req, res) => {
     if (req.body.to && req.body.longitude && req.body.latitude && req.body.name && req.body.adress && req.body.bussinesAccountId && req.body.messageToken) {
         const idNumber = await getPhoneNumberWhitID(req.body.from, req.body.messageToken, req.body.bussinesAccountId)
+        const phoneNumber = await phone.find({ number: req.body.from });
+        if (phoneNumber.message > 2000) {
+            res.status(500).json({
+                mensaje: "maxima cantidad de mensajes alcanzada",
+            });
+        }
         if (idNumber.exist == true) {
             try {
                 var data = JSON.stringify({
@@ -397,8 +442,9 @@ messagesController.postLocationMessage = async (req, res) => {
                     data: data
                 };
                 axios(config)
-                    .then(function (response) {
+                    .then(async function (response) {
                         res.status(200).json({ mensaje: "enviado" });
+                        await phone.findOneAndUpdate({ number: req.body.from }, { $inc: { 'messages': 1 } });
                     })
                     .catch(function (error) {
                         console.log(error);
@@ -426,7 +472,7 @@ messagesController.getAccountPhonesJWT = async (req, res) => {
     if (typeof baererHeader !== 'undefined') {
         const baererToken = baererHeader.split(" ")[1]
         req.token = baererToken;
-        const permission = await permissionJWTVerify(baererToken, JWTFlag.permissionNameEdit)
+        const permission = await permissionJWTVerify(baererToken)
         if (permission.flag == false) {
             res.sendStatus(403)
         } else {

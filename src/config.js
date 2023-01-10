@@ -12,12 +12,6 @@ export const urlMeta = {
 export const PORT = {
     PORT: 4000
 }
-export const JWTFlag = {
-    JWTFlag: false,
-    permissionNameView: "whatsapp.view",
-    permissionNameEdit: "whatsapp.edit",
-    jwtKeyFileName: "jwt-key"
-}
 export const OwnJWT = {
     Flag: true,
     jwtkey: "jwt-key",

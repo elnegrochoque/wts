@@ -1,8 +1,8 @@
 import Router from "express";
 import messagesController from "../controllers/messages.controllers.js";
-import { JWTFlag, OwnJWT } from "../config.js";
+import {  OwnJWT } from "../config.js";
 const router = Router();
-if (JWTFlag.JWTFlag === true || OwnJWT.Flag === true) {
+if (OwnJWT.Flag === true) {
     router.route('/messages')
         .get(messagesController.getMessageJWT)
     router.route('/messages/send/text')
