@@ -183,9 +183,9 @@ phonesController.getPhonesJWT = async (req, res) => {
                                         res.status(200).json(result);
                                     }
                                 }
-                                if (req.query.bussinesAccountId) {
-                                    const bussinesAccountId = req.query.bussinesAccountId
-                                    if (permission.user.user.permisions.find(permissionsAux => permissionsAux === 'admin')) {
+                                if (req.query.bussinesAccountId == "true") {
+                                    if (permission.user.user.permisions.find(permissionsAux => permissionsAux === 'admin') && req.query.bussinesAccountIdString) {
+                                        const bussinesAccountId = req.query.bussinesAccountIdString
                                         const phonesCount = await phone.count({ bussinesAccountId: bussinesAccountId });
                                         const phones = await phone.find({ bussinesAccountId: bussinesAccountId });
                                         const result = []
@@ -201,6 +201,11 @@ phonesController.getPhonesJWT = async (req, res) => {
                                         res.status(200).json(result);
                                     }
                                 }
+                                else {
+                                    res.status(500).json({
+                                        mensaje: "error al obtener parametros",
+                                    });
+                                } 
 
                             }
                             else {
