@@ -183,6 +183,24 @@ phonesController.getPhonesJWT = async (req, res) => {
                                         res.status(200).json(result);
                                     }
                                 }
+                                if (req.query.bussinesAccountId) {
+                                    const bussinesAccountId = req.query.bussinesAccountId
+                                    if (permission.user.user.permisions.find(permissionsAux => permissionsAux === 'admin')) {
+                                        const phonesCount = await phone.count({ bussinesAccountId: bussinesAccountId });
+                                        const phones = await phone.find({ bussinesAccountId: bussinesAccountId });
+                                        const result = []
+                                        result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": phonesCount } })
+                                        result.push({ phones: phones })
+                                        res.status(200).json(result);
+                                    } else {
+                                        const phonesCount = await phone.count({ bussinesAccountId: permission.user.user.bussinesAccountId });
+                                        const phones = await phone.find({ bussinesAccountId: permission.user.user.bussinesAccountId });
+                                        const result = []
+                                        result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": phonesCount } })
+                                        result.push({ phones: phones })
+                                        res.status(200).json(result);
+                                    }
+                                }
 
                             }
                             else {
