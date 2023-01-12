@@ -116,7 +116,7 @@ phonesController.getPhonesJWT = async (req, res) => {
                                     const bu = req.query.bu
                                     if (permission.user.user.permisions.find(permissionsAux => permissionsAux === 'admin')) {
                                         const phonesCount = await phone.count({ businessUnit: bu });
-                                        const phones = await phone.find({ businessUnit: bu });
+                                        const phones = await phone.find({ businessUnit: bu }).skip((elements * page) - elements).limit(elements);
                                         const result = []
                                         result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": phonesCount } })
                                         result.push({ phones: phones })
@@ -134,14 +134,14 @@ phonesController.getPhonesJWT = async (req, res) => {
                                     const name = req.query.name
                                     if (permission.user.user.permisions.find(permissionsAux => permissionsAux === 'admin')) {
                                         const phonesCount = await phone.count({ name: name });
-                                        const phones = await phone.find({ name: name });
+                                        const phones = await phone.find({ name: name }).skip((elements * page) - elements).limit(elements);
                                         const result = []
                                         result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": phonesCount } })
                                         result.push({ phones: phones })
                                         res.status(200).json(result);
                                     } else {
                                         const phonesCount = await phone.count({ name: name, bussinesAccountId: permission.user.user.bussinesAccountId });
-                                        const phones = await phone.find({ name: name, bussinesAccountId: permission.user.user.bussinesAccountId });
+                                        const phones = await phone.find({ name: name, bussinesAccountId: permission.user.user.bussinesAccountId }).skip((elements * page) - elements).limit(elements);
                                         const result = []
                                         result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": phonesCount } })
                                         result.push({ phones: phones })
@@ -153,14 +153,14 @@ phonesController.getPhonesJWT = async (req, res) => {
                                     const email = req.query.email
                                     if (permission.user.user.permisions.find(permissionsAux => permissionsAux === 'admin')) {
                                         const phonesCount = await phone.count({ email: email });
-                                        const phones = await phone.find({ email: email });
+                                        const phones = await phone.find({ email: email }).skip((elements * page) - elements).limit(elements);
                                         const result = []
                                         result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": phonesCount } })
                                         result.push({ phones: phones })
                                         res.status(200).json(result);
                                     } else {
                                         const phonesCount = await phone.count({ email: email, bussinesAccountId: permission.user.user.bussinesAccountId });
-                                        const phones = await phone.find({ email: email, bussinesAccountId: permission.user.user.bussinesAccountId });
+                                        const phones = await phone.find({ email: email, bussinesAccountId: permission.user.user.bussinesAccountId }).skip((elements * page) - elements).limit(elements);
                                         const result = []
                                         result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": phonesCount } })
                                         result.push({ phones: phones })
@@ -171,14 +171,14 @@ phonesController.getPhonesJWT = async (req, res) => {
                                     const phoneNumber = req.query.phoneNumber
                                     if (permission.user.user.permisions.find(permissionsAux => permissionsAux === 'admin')) {
                                         const phonesCount = await phone.count({ phoneNumber: phoneNumber });
-                                        const phones = await phone.find({ phoneNumber: phoneNumber });
+                                        const phones = await phone.find({ phoneNumber: phoneNumber }).skip((elements * page) - elements).limit(elements);
                                         const result = []
                                         result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": phonesCount } })
                                         result.push({ phones: phones })
                                         res.status(200).json(result);
                                     } else {
                                         const phonesCount = await phone.count({ phoneNumber: phoneNumber, bussinesAccountId: permission.user.user.bussinesAccountId });
-                                        const phones = await phone.find({ phoneNumber: phoneNumber, bussinesAccountId: permission.user.user.bussinesAccountId });
+                                        const phones = await phone.find({ phoneNumber: phoneNumber, bussinesAccountId: permission.user.user.bussinesAccountId }).skip((elements * page) - elements).limit(elements);
                                         const result = []
                                         result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": phonesCount } })
                                         result.push({ phones: phones })
@@ -189,14 +189,14 @@ phonesController.getPhonesJWT = async (req, res) => {
 
                                     if (permission.user.user.permisions.find(permissionsAux => permissionsAux === 'admin')) {
                                         const phonesCount = await phone.count({ tiendaId: permission.user.user.tiendaId });
-                                        const phones = await phone.find({ tiendaId: permission.user.user.tiendaId });
+                                        const phones = await phone.find({ tiendaId: permission.user.user.tiendaId }).skip((elements * page) - elements).limit(elements);
                                         const result = []
                                         result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": phonesCount } })
                                         result.push({ phones: phones })
                                         res.status(200).json(result);
                                     } else {
                                         const phonesCount = await phone.count({ tiendaId: permission.user.user.tiendaId, bussinesAccountId: permission.user.user.bussinesAccountId });
-                                        const phones = await phone.find({ tiendaId: permission.user.user.tiendaId, bussinesAccountId: permission.user.user.bussinesAccountId });
+                                        const phones = await phone.find({ tiendaId: permission.user.user.tiendaId, bussinesAccountId: permission.user.user.bussinesAccountId }).skip((elements * page) - elements).limit(elements);
                                         const result = []
                                         console.log(permission.user.user)
                                         result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": phonesCount } })
@@ -208,14 +208,14 @@ phonesController.getPhonesJWT = async (req, res) => {
                                     if (permission.user.user.permisions.find(permissionsAux => permissionsAux === 'admin') && req.query.bussinesAccountIdString) {
                                         const bussinesAccountId = req.query.bussinesAccountIdString
                                         const phonesCount = await phone.count({ bussinesAccountId: bussinesAccountId });
-                                        const phones = await phone.find({ bussinesAccountId: bussinesAccountId });
+                                        const phones = await phone.find({ bussinesAccountId: bussinesAccountId }).skip((elements * page) - elements).limit(elements);
                                         const result = []
                                         result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": phonesCount } })
                                         result.push({ phones: phones })
                                         res.status(200).json(result);
                                     } else {
                                         const phonesCount = await phone.count({ bussinesAccountId: permission.user.user.bussinesAccountId });
-                                        const phones = await phone.find({ bussinesAccountId: permission.user.user.bussinesAccountId });
+                                        const phones = await phone.find({ bussinesAccountId: permission.user.user.bussinesAccountId }).skip((elements * page) - elements).limit(elements);
                                         const result = []
                                         result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": phonesCount } })
                                         result.push({ phones: phones })
