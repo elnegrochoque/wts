@@ -27,12 +27,14 @@ app.post("/webhook", async (req, res) => {
         ) {
             try {
                 const to = req.body.entry[0].changes[0].value.metadata.display_phone_number
-                await phone.findOneAndUpdate({ number: to }, { $inc: { 'hits': 1 } });
+                const phoneAux = await phone.find({phoneNumber: to})
+                await phone.findOneAndUpdate({ phoneNumber: to }, { $inc: { 'hits': 1 } });
                 const newMessage = new message({
                     message: req.body.entry[0].changes[0].value.messages[0].text.body,
                     from: req.body.entry[0].changes[0].value.messages[0].from,
                     to: to,
-                    whatsappBussinessId: req.body.entry[0].id
+                    whatsappBussinessId: req.body.entry[0].id,
+                    tiendaId: phoneAux[0].tiendaId
                 })
                 await newMessage.save()
             } catch (error) {

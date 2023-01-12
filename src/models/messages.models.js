@@ -5,7 +5,8 @@ const messageSchema = new Schema(
         message: String,
         from: String,
         to: String,
-        whatsappBussinessId: String
+        whatsappBussinessId: String, 
+        tiendaId: String
     }, { timestamps: true }
 
 );

@@ -10,7 +10,7 @@ const phoneSchema = new Schema(
         businessUnit: String,
         bussinesAccountId: { type: String, required: true },
         messages: Number,
-        tiendaid: String
+        tiendaId: String
     }, { timestamps: true }
 
 );
