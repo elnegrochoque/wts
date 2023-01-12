@@ -123,7 +123,7 @@ phonesController.getPhonesJWT = async (req, res) => {
                                         res.status(200).json(result);
                                     } else {
                                         const phonesCount = await phone.count({ businessUnit: bu, bussinesAccountId: permission.user.user.bussinesAccountId });
-                                        const phones = await phone.find({ businessUnit: bu, bussinesAccountId: permission.user.user.bussinesAccountId });
+                                        const phones = await phone.find({ businessUnit: bu, bussinesAccountId: permission.user.user.bussinesAccountId }).skip((elements * page) - elements).limit(elements);
                                         const result = []
                                         result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": phonesCount } })
                                         result.push({ phones: phones })
