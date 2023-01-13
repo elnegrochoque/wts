@@ -133,15 +133,15 @@ phonesController.getPhonesJWT = async (req, res) => {
                                 if (req.query.name) {
                                     const name = req.query.name
                                     if (permission.user.user.permisions.find(permissionsAux => permissionsAux === 'admin')) {
-                                        const phonesCount = await phone.count({ name: name });
-                                        const phones = await phone.find({ name: name }).skip((elements * page) - elements).limit(elements);
+                                        const phonesCount = await phone.count({ name: {$regex: name, $options: 'i' } });
+                                        const phones = await phone.find({ name: {$regex: name, $options: 'i' } }).skip((elements * page) - elements).limit(elements);
                                         const result = []
                                         result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": phonesCount } })
                                         result.push({ phones: phones })
                                         res.status(200).json(result);
                                     } else {
-                                        const phonesCount = await phone.count({ name: name, bussinesAccountId: permission.user.user.bussinesAccountId });
-                                        const phones = await phone.find({ name: name, bussinesAccountId: permission.user.user.bussinesAccountId }).skip((elements * page) - elements).limit(elements);
+                                        const phonesCount = await phone.count({ name: { $regex: name, $options: 'i' }, bussinesAccountId: permission.user.user.bussinesAccountId });
+                                        const phones = await phone.find({ name: {$regex: name, $options: 'i' }, bussinesAccountId: permission.user.user.bussinesAccountId }).skip((elements * page) - elements).limit(elements);
                                         const result = []
                                         result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": phonesCount } })
                                         result.push({ phones: phones })
