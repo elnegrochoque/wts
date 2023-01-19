@@ -9,6 +9,8 @@ if (OwnJWT.Flag === true) {
         .post(messagesController.postTextMessageJWT)
     router.route('/messages/send/location')
         .post(messagesController.postLocationMessageJWT)
+        router.route('/messages/send/template/issue')
+        .post(messagesController.postTemplateIssueJWT)
     router.route('/messages/accountphones')
         .get(messagesController.getAccountPhonesJWT)
 

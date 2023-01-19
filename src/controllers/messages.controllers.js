@@ -566,4 +566,112 @@ messagesController.getAccountPhones = async (req, res) => {
     }
 }
 
+messagesController.postTemplateIssueJWT = async (req, res) => {
+    const baererHeader = req.headers.authorization;
+    if (typeof baererHeader !== 'undefined') {
+        const baererToken = baererHeader.split(" ")[1]
+        req.token = baererToken;
+        const permission = await permissionJWTVerify(baererToken)
+        if (permission.flag == false) {
+            res.sendStatus(403)
+        } else {
+            if (req.body.to && req.body.name && req.body.from) {
+                const idNumber = await getPhoneNumberWhitID(req.body.from, permission.user.user.bussinesAccountId, permission.user.user.messageToken)
+                if (idNumber.exist == true) {
+                    try {
+                        var data = JSON.stringify({
+                            "messaging_product": "whatsapp",
+                            "to": req.body.to,
+                            "type": "template",
+                            "template": {
+                                "name": "sample_issue_resolution",
+                                "language": {
+                                    "code": "es",
+                                    "policy": "deterministic"
+                                },
+                                "components": [
+                                    {
+                                        "type": "body",
+                                        "parameters": [
+                                            {
+                                                "type": "text",
+                                                "text": req.body.name
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "type": "button",
+                                        "sub_type": "quick_reply",
+                                        "index": 0,
+                                        "parameters": [
+                                            {
+                                                "type": "text",
+                                                "text": "Yes"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "type": "button",
+                                        "sub_type": "quick_reply",
+                                        "index": 1,
+                                        "parameters": [
+                                            {
+                                                "type": "text",
+                                                "text": "No"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        });
+                        var config = {
+                            method: 'post',
+                            url: urlMeta.url + idNumber.id + '/messages',
+                            headers: {
+                                'Authorization': 'Bearer ' + permission.user.user.messageToken,
+                                'Content-Type': 'application/json'
+                            },
+                            data: data
+                        };
+                        axios(config)
+                            .then(async function (response) {
+                                await phone.findOneAndUpdate({ number: req.body.from }, { $inc: { 'messages': 1 } });
+                                const newMessage = new message({
+                                    message: req.body.text,
+                                    from: req.body.from,
+                                    to: req.body.to,
+                                    whatsappBussinessId: permission.user.user.bussinesAccountId,
+                                    tiendaId: permission.user.user.tiendaId
+                                })
+                                await newMessage.save()
+                                res.status(200).json({ mensaje: "enviado" });
+
+                            })
+                            .catch(function (error) {
+                                res.status(500).json({
+                                    mensaje: "error al obtener informacion",
+                                });
+                                console.log(error);
+                            });
+                    } catch (error) {
+                        console.log(error);
+                        res.status(500).json({
+                            mensaje: "error al obtener informacion",
+                        });
+                    }
+                } else {
+                    res.status(500).json({
+                        mensaje: "error al obtener informacion",
+                    });
+                }
+            } else {
+                res.status(500).json({
+                    mensaje: "error al obtener informacion",
+                });
+            }
+        }
+    } else {
+        res.sendStatus(403)
+    }
+};
 export default messagesController;
