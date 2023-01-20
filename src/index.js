@@ -8,6 +8,7 @@ import messagesRoutes from "./routes/messages.routes.js"
 import phonesRoutes from "./routes/phones.routes.js"
 import { PORT, whatsappToken } from "./config.js";
 import phone from "./models/phones.models.js";
+import contactsRoutes from "./routes/contacts.routes.js"
 
 const app = express();
 
@@ -68,3 +69,4 @@ app.get("/webhook", (req, res) => {
 
 app.use("/api", messagesRoutes);
 app.use("/api", phonesRoutes);
+app.use("/api", contactsRoutes);

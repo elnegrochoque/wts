@@ -133,15 +133,15 @@ phonesController.getPhonesJWT = async (req, res) => {
                                 if (req.query.name) {
                                     const name = req.query.name
                                     if (permission.user.user.permisions.find(permissionsAux => permissionsAux === 'admin')) {
-                                        const phonesCount = await phone.count({ name: {$regex: name, $options: 'i' } });
-                                        const phones = await phone.find({ name: {$regex: name, $options: 'i' } }).skip((elements * page) - elements).limit(elements);
+                                        const phonesCount = await phone.count({ name: { $regex: name, $options: 'i' } });
+                                        const phones = await phone.find({ name: { $regex: name, $options: 'i' } }).skip((elements * page) - elements).limit(elements);
                                         const result = []
                                         result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": phonesCount } })
                                         result.push({ phones: phones })
                                         res.status(200).json(result);
                                     } else {
                                         const phonesCount = await phone.count({ name: { $regex: name, $options: 'i' }, bussinesAccountId: permission.user.user.bussinesAccountId });
-                                        const phones = await phone.find({ name: {$regex: name, $options: 'i' }, bussinesAccountId: permission.user.user.bussinesAccountId }).skip((elements * page) - elements).limit(elements);
+                                        const phones = await phone.find({ name: { $regex: name, $options: 'i' }, bussinesAccountId: permission.user.user.bussinesAccountId }).skip((elements * page) - elements).limit(elements);
                                         const result = []
                                         result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": phonesCount } })
                                         result.push({ phones: phones })
@@ -198,7 +198,6 @@ phonesController.getPhonesJWT = async (req, res) => {
                                         const phonesCount = await phone.count({ tiendaId: permission.user.user.tiendaId, bussinesAccountId: permission.user.user.bussinesAccountId });
                                         const phones = await phone.find({ tiendaId: permission.user.user.tiendaId, bussinesAccountId: permission.user.user.bussinesAccountId }).skip((elements * page) - elements).limit(elements);
                                         const result = []
-                                        console.log(permission.user.user)
                                         result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": phonesCount } })
                                         result.push({ phones: phones })
                                         res.status(200).json(result);
@@ -257,24 +256,28 @@ phonesController.getPhonesJWT = async (req, res) => {
 
 phonesController.postCreatePhone = async (req, res) => {
     try {
-        const { phoneNumber, businessUnit, name, email, user } = req.body;
-        const regex = /^[0-9]*$/;
-        const onlyNumbers = regex.test(phoneNumber);
-        console.log(onlyNumbers)
-        const newPhone = new phone({
-            name: name,
-            email: email,
-            businessUnit: businessUnit,
-            phoneNumber: phoneNumber,
-            enable: false,
-            hits: 0,
-            user: user,
-            messages: 0
-        });
-        await newPhone.save();
-        res.status(201).json({
-            mensaje: "Teléfono agregado",
-        });
+        const { phoneNumber, businessUnit, name, email, bussinesAccountId, tiendaId } = req.body;
+        if (isNum(phoneNumber)) {
+            const newPhone = new phone({
+                name: name,
+                email: email,
+                businessUnit: businessUnit,
+                phoneNumber: phoneNumber,
+                enable: false,
+                hits: 0,
+                bussinesAccountId: bussinesAccountId,
+                messages: 0,
+                tiendaId: tiendaId
+            });
+            await newPhone.save();
+            res.status(201).json({
+                mensaje: "Teléfono agregado",
+            });
+        } else {
+            res.status(500).json({
+                mensaje: "Problemas al crear el teléfono",
+            });
+        }
     } catch (error) {
         console.log(error);
         if (error.code && error.code == 11000) {
@@ -559,7 +562,6 @@ phonesController.putPhoneById = async (req, res) => {
                 mensaje: "Teléfono modificado",
             });
         }
-
     } catch (error) {
         console.log(error);
         res.status(500).json({
@@ -610,7 +612,9 @@ phonesController.putPhoneByIdJWT = async (req, res) => {
                             businessUnit: businessUnit,
                             phoneNumber: phoneNumber,
                             enable: enable,
-                            hits: 0
+                            hits: 0,
+                            bussinesAccountId: permission.user.user.bussinesAccountId,
+                            tiendaId: permission.user.user.tiendaId
                         };
                         const updatePhone = await phone.findOneAndUpdate({ _id: req.params.id, bussinesAccountId: permission.user.user.bussinesAccountId }, newPhone, { useFindAndModify: true });
                         if (updatePhone == null) {

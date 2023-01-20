@@ -68,7 +68,6 @@ messagesController.getMessageJWT = async (req, res) => {
                     if (req.query.page) {
                         const page = req.query.page
                         if (req.query.number) {
-                            console.log(req.query.number)
                             const messageCount = await message.count({ $or: [{ from: { $regex: req.query.number }, whatsappBussinessId: permission.user.user.bussinesAccountId }, { to: { $regex: req.query.number }, whatsappBussinessId: permission.user.user.bussinesAccountId }] });
                             const result = []
                             result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": messageCount } })
@@ -170,7 +169,6 @@ messagesController.getMessageJWT = async (req, res) => {
                             res.status(200).json(result);
                         }
                         if (req.query.tiendaId == "true") {
-                            console.log(permission.user.user.tiendaId)
                             const messageCount = await message.count({ tiendaId: permission.user.user.tiendaId, whatsappBussinessId: permission.user.user.bussinesAccountId });
                             const result = []
                             result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": messageCount } })
