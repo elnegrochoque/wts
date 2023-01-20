@@ -52,15 +52,15 @@ contactController.getContactsJWT = async (req, res) => {
                                 if (req.query.lastName) {
                                     const lastName = req.query.lastName
                                     if (permission.user.user.permisions.find(permissionsAux => permissionsAux === 'admin')) {
-                                        const contactCount = await contact.count({ lastName: lastName });
-                                        const contacts = await contact.find({ lastName: lastName }).skip((elements * page) - elements).limit(elements);
+                                        const contactCount = await contact.count({ lastName: { $regex: lastName, $options: 'i' } });
+                                        const contacts = await contact.find({ lastName: { $regex: lastName, $options: 'i' } }).skip((elements * page) - elements).limit(elements);
                                         const result = []
                                         result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": contactCount } })
                                         result.push({ contacts: contacts })
                                         res.status(200).json(result);
                                     } else {
-                                        const contactsCount = await contact.count({ lastName: lastName, bussinesAccountId: permission.user.user.bussinesAccountId });
-                                        const contacts = await contact.find({ lastName: lastName, bussinesAccountId: permission.user.user.bussinesAccountId }).skip((elements * page) - elements).limit(elements);
+                                        const contactsCount = await contact.count({ lastName: { $regex: lastName, $options: 'i' }, bussinesAccountId: permission.user.user.bussinesAccountId });
+                                        const contacts = await contact.find({ lastName: { $regex: lastName, $options: 'i' }, bussinesAccountId: permission.user.user.bussinesAccountId }).skip((elements * page) - elements).limit(elements);
                                         const result = []
                                         result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": contactsCount } })
                                         result.push({ contacts: contacts })
