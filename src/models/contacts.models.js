@@ -7,7 +7,8 @@ const contactSchema = new Schema(
         tiendaId: String,
         bussinesAccountId: String, 
         email: String,
-        phone: { type: String, unique: true, required: true } 
+        phone: { type: String, unique: true, required: true } ,
+        company: String
     }, { timestamps: true }
 
 );

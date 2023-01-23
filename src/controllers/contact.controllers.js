@@ -67,6 +67,24 @@ contactController.getContactsJWT = async (req, res) => {
                                         res.status(200).json(result);
                                     }
                                 }
+                                if (req.query.company) {
+                                    const company = req.query.company
+                                    if (permission.user.user.permisions.find(permissionsAux => permissionsAux === 'admin')) {
+                                        const contactCount = await contact.count({ company: { $regex: company, $options: 'i' } });
+                                        const contacts = await contact.find({ company: { $regex: company, $options: 'i' } }).skip((elements * page) - elements).limit(elements);
+                                        const result = []
+                                        result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": contactCount } })
+                                        result.push({ contacts: contacts })
+                                        res.status(200).json(result);
+                                    } else {
+                                        const contactsCount = await contact.count({ company: { $regex: company, $options: 'i' }, bussinesAccountId: permission.user.user.bussinesAccountId });
+                                        const contacts = await contact.find({ company: { $regex: company, $options: 'i' }, bussinesAccountId: permission.user.user.bussinesAccountId }).skip((elements * page) - elements).limit(elements);
+                                        const result = []
+                                        result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": contactsCount } })
+                                        result.push({ contacts: contacts })
+                                        res.status(200).json(result);
+                                    }
+                                }
                                 if (req.query.name) {
                                     const name = req.query.name
                                     if (permission.user.user.permisions.find(permissionsAux => permissionsAux === 'admin')) {
@@ -193,7 +211,7 @@ contactController.getContactsJWT = async (req, res) => {
 
 contactController.postCreateContact = async (req, res) => {
     try {
-        const { name, lastName, email, bussinesAccountId, tiendaId, phone } = req.body;
+        const { name, lastName, email, bussinesAccountId, tiendaId, phone, company } = req.body;
         if (isNum(phone)) {
             const newContact = new contact({
                 name: name,
@@ -201,7 +219,8 @@ contactController.postCreateContact = async (req, res) => {
                 tiendaId: tiendaId,
                 bussinesAccountId: bussinesAccountId,
                 email: email,
-                phone: phone
+                phone: phone,
+                company: company
             });
             await newContact.save();
             res.status(201).json({
@@ -240,7 +259,7 @@ contactController.postCreateContactJWT = async (req, res) => {
             } else {
                 try {
                     if (permission.user.user.permisions.find(permissionsAux => permissionsAux === 'admin')) {
-                        const { name, lastName, email, bussinesAccountId, tiendaId, phone } = req.body;
+                        const { name, lastName, email, bussinesAccountId, tiendaId, phone, company } = req.body;
                         if (isNum(phone)) {
                             const newContact = new contact({
                                 name: name,
@@ -248,7 +267,8 @@ contactController.postCreateContactJWT = async (req, res) => {
                                 tiendaId: tiendaId,
                                 bussinesAccountId: bussinesAccountId,
                                 email: email,
-                                phone: phone
+                                phone: phone,
+                                company: company
                             });
                             await newContact.save();
                             res.status(201).json({
@@ -260,7 +280,7 @@ contactController.postCreateContactJWT = async (req, res) => {
                             });
                         }
                     } else {
-                        const { name, lastName, email, phone } = req.body;
+                        const { name, lastName, email, phone, company } = req.body;
                         if (isNum(phone)) {
                             const newcontact = new contact({
                                 name: name,
@@ -268,7 +288,8 @@ contactController.postCreateContactJWT = async (req, res) => {
                                 email: email,
                                 phone: phone,
                                 bussinesAccountId: permission.user.user.bussinesAccountId,
-                                tiendaId: permission.user.user.tiendaId
+                                tiendaId: permission.user.user.tiendaId,
+                                company: company
                             });
                             await newcontact.save();
                             res.status(201).json({
@@ -307,15 +328,18 @@ contactController.postCreateContactJWT = async (req, res) => {
 
 contactController.putContactById = async (req, res) => {
     try {
-        const { name, lastName, email, phone, bussinesAccountId, tiendaId } = req.body;
-        if (isNum(phone)) {
+        console.log("hola")
+        const { name, lastName, email, phone, bussinesAccountId, tiendaId, company } = req.body;
+        console.log(name, lastName, email, phone, bussinesAccountId, tiendaId, company)
+        if (name && lastName && email && phone && company && bussinesAccountId && tiendaId && isNum(phone)) {
             const newContact = new contact({
                 name: name,
                 lastName: lastName,
                 email: email,
                 phone: phone,
                 bussinesAccountId: bussinesAccountId,
-                tiendaId: tiendaId
+                tiendaId: tiendaId,
+                company: company
             });
             const updateContact = await contact.findOneAndUpdate({ _id: req.params.id }, newContact, { useFindAndModify: true });
             if (updateContact == null) {
@@ -340,6 +364,7 @@ contactController.putContactById = async (req, res) => {
     }
 };
 contactController.putContactByIdJWT = async (req, res) => {
+
     try {
         const baererHeader = req.headers.authorization;
         if (typeof baererHeader !== 'undefined') {
@@ -353,37 +378,42 @@ contactController.putContactByIdJWT = async (req, res) => {
             } else {
                 try {
                     if (permission.user.user.permisions.find(permissionsAux => permissionsAux === 'admin')) {
-                        const { name, lastName, email, phone, bussinesAccountId, tiendaId } = req.body;
-                        if (isNum(phone)) {
-                            const newContact = new contact({
-                                name: name,
-                                lastName: lastName,
-                                email: email,
-                                phone: phone,
-                                bussinesAccountId: bussinesAccountId,
-                                tiendaId: tiendaId
-                            });
-                            const updateContact = await contact.findOneAndUpdate({ _id: req.params.id }, newContact, { useFindAndModify: true });
-                            if (updateContact == null) {
-                                res.status(201).json({
-                                    mensaje: "Contacto inexistente",
+                        const { name, lastName, email, phone, bussinesAccountId, tiendaId, company } = req.body;
+                        if (name && lastName && email && phone && company && bussinesAccountId && tiendaId && isNum(phone)) {
+                            {
+                                const newContact = new contact({
+                                    name: name,
+                                    lastName: lastName,
+                                    email: email,
+                                    phone: phone,
+                                    bussinesAccountId: bussinesAccountId,
+                                    tiendaId: tiendaId,
+                                    company: company
                                 });
-                            } else {
-                                res.status(201).json({
-                                    mensaje: "Contacto modificado",
-                                });
+                                const updateContact = await contact.findOneAndUpdate({ _id: req.params.id }, newContact, { useFindAndModify: true });
+                                if (updateContact == null) {
+                                    res.status(201).json({
+                                        mensaje: "Contacto inexistente",
+                                    });
+                                } else {
+                                    res.status(201).json({
+                                        mensaje: "Contacto modificado",
+                                    });
+                                }
                             }
                         }
-                    } else {
-                        const { name, lastName, email, phone } = req.body;
-                        if (isNum(phone)) {
+                    } else {                      
+                        const { name, lastName, email, phone, company } = req.body;
+                        if (name && lastName && email && phone && company && isNum(phone)) {
+                            console.log("hola")
                             const newContact = {
                                 name: name,
                                 lastName: lastName,
                                 email: email,
                                 phone: phone,
                                 bussinesAccountId: permission.user.user.bussinesAccountId,
-                                tiendaId: permission.user.user.tiendaId
+                                tiendaId: permission.user.user.tiendaId,
+                                company: company
                             };
                             const updateContact = await contact.findOneAndUpdate({ _id: req.params.id }, newContact, { useFindAndModify: true });
                             if (updateContact == null) {
@@ -396,6 +426,12 @@ contactController.putContactByIdJWT = async (req, res) => {
                                 });
                             }
                         }
+                        else {
+                            res.status(500).json({
+                                mensaje: "Problemas al modificar el contacto",
+                            });
+                        }
+
                     }
 
                 } catch (error) {
@@ -487,6 +523,47 @@ contactController.deleteContacById = async (req, res) => {
         console.log(error);
         res.status(500).json({
             mensaje: "Problemas al modificar el contacto",
+        });
+    }
+};
+
+
+contactController.getContactByIdJWT = async (req, res) => {
+    try {
+        const baererHeader = req.headers.authorization;
+        if (typeof baererHeader !== 'undefined') {
+            const baererToken = baererHeader.split(" ")[1]
+            req.token = baererToken;
+            const permission = await permissionJWTVerify(baererToken)
+            if (permission.flag == false || (
+                permission.user.user.permisions.find(permissionsAux => permissionsAux === 'admin') == undefined &&
+                permission.user.user.permisions.find(permissionsAux => permissionsAux === 'view') == undefined)) {
+                res.sendStatus(403)
+            } else {
+                try {
+                    if (permission.user.user.permisions.find(permissionsAux => permissionsAux === 'admin')) {
+                        const id = req.params.id
+                        const objectContact = await contact.findById(id);
+                        res.status(200).json(objectPhone);
+                    } else {
+                        const id = req.params.id
+                        const objectContact = await contact.find({ _id: id, bussinesAccountId: permission.user.user.bussinesAccountId });
+                        res.status(200).json(objectContact);
+                    }
+                } catch (error) {
+                    console.log(error);
+                    res.status(500).json({
+                        mensaje: "error al obtener informacion",
+                    });
+                }
+            }
+        } else {
+            res.sendStatus(403)
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            mensaje: "error al obtener informacion",
         });
     }
 };

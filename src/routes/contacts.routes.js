@@ -9,6 +9,7 @@ if (OwnJWT.Flag === true) {
     router.route('/contacts/:id')
         .put(contactController.putContactByIdJWT)
         .delete(contactController.deleteContactByIdJWT)
+        .get(contactController.getContactByIdJWT)
 
 }
 else {
