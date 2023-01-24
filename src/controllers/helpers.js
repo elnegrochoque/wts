@@ -43,3 +43,36 @@ export const mediaLimits = (type) => {
       return "";
   }
 };
+
+export const fileType = (mimetype) => {
+
+  if (mimetype == "text/plain" ||
+    mimetype == "application/pdf" ||
+    mimetype == "application/vnd.ms-powerpoint" ||
+    mimetype == "application/msword" ||
+    mimetype == "application/vnd.ms-excel" ||
+    mimetype == "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
+    mimetype == "application/vnd.openxmlformats-officedocument.presentationml.presentation" ||
+    mimetype == " application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
+    const fileTypeAux = ["DOCUMENT", "document"]
+    return fileTypeAux
+  }
+  if (mimetype == "audio/aac" ||
+    mimetype == "audio/mp4" ||
+    mimetype == "audio/mpe" ||
+    mimetype == "audio/amr" ||
+    mimetype == "audio/ogg") {
+    const fileTypeAux = ["AUDIO", "audio"]
+    return fileTypeAux
+  }
+  if (mimetype == "image/jpeg" ||
+    mimetype == "image/png") {
+    const fileTypeAux = ["IMAGE", "image"]
+    return fileTypeAux
+  }
+  if (mimetype == "video/mp4" ||
+    mimetype == "video/3gp") {
+    const fileTypeAux = ["VIDEO", "video"]
+    return fileTypeAux 
+  }
+}

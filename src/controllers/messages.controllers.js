@@ -5,7 +5,7 @@ import axios from "axios";
 import { permissionJWTVerify } from "./jwt.controllers.js";
 import phone from "../models/phones.models.js";
 import formidable from "formidable";
-import { mediaLimits, validateMediaSize } from "./helpers.js";
+import { fileType, mediaLimits, validateMediaSize } from "./helpers.js";
 import fs from "fs";
 import request from "request";
 const messagesController = {};
@@ -707,6 +707,7 @@ messagesController.postSendImage = async (req, res) => {
                         )}`,
                     });
                 }
+                console.log(files.file.originalFilename)
                 request.post(
                     {
                         url: `https://graph.facebook.com/v13.0/112456731683954/media`,
@@ -714,7 +715,7 @@ messagesController.postSendImage = async (req, res) => {
                             file: {
                                 value: fs.createReadStream(files.file.filepath),
                                 options: {
-                                    filename: files.file.name,
+                                    filename: files.file.originalFilename,
                                     contentType: files.file.mimetype,
                                 },
                             },
@@ -731,19 +732,29 @@ messagesController.postSendImage = async (req, res) => {
                             console.log("Error!");
                         } else {
                             const idNumber = await getPhoneNumberWhitID(req.query.from, permission.user.user.bussinesAccountId, permission.user.user.messageToken)
-
+                            console.log(files.file.mimetype)
                             const bodyAux = JSON.parse(body)
+                            const fileTypeAux = fileType(files.file.mimetype)
+                            console.log(fileTypeAux)
                             if (idNumber.exist == true) {
                                 try {
-                                    var data = JSON.stringify({
+                                    const jsonAux = {
                                         "messaging_product": "whatsapp",
                                         "recipient_type": "individual",
                                         "to": req.query.to,
-                                        "type": "IMAGE",
-                                        "image": {
+                                        "type": fileTypeAux[0]
+                                    }
+                                    if (fileTypeAux[0]=="IMAGE"||fileTypeAux[0]=="VIDEO") {
+                                        jsonAux[fileTypeAux[1]] = {
                                             "id": bodyAux.id
                                         }
-                                    });
+                                    } else {
+                                        jsonAux[fileTypeAux[1]] = {
+                                            "id": bodyAux.id,
+                                            "filename": files.file.originalFilename,
+                                        }
+                                    }
+                                    var data = JSON.stringify(jsonAux);
                                     var config = {
                                         method: 'post',
                                         url: urlMeta.url + idNumber.id + '/messages',
