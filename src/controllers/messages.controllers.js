@@ -4,7 +4,10 @@ import { urlMeta } from "../config.js";
 import axios from "axios";
 import { permissionJWTVerify } from "./jwt.controllers.js";
 import phone from "../models/phones.models.js";
-
+import formidable from "formidable";
+import { mediaLimits, validateMediaSize } from "./helpers.js";
+import fs from "fs";
+import request from "request";
 const messagesController = {};
 
 
@@ -644,6 +647,179 @@ messagesController.postTemplateIssueJWT = async (req, res) => {
                                 await newMessage.save()
                                 res.status(200).json({ mensaje: "enviado" });
 
+                            })
+                            .catch(function (error) {
+                                res.status(500).json({
+                                    mensaje: "error al obtener informacion",
+                                });
+                                console.log(error);
+                            });
+                    } catch (error) {
+                        console.log(error);
+                        res.status(500).json({
+                            mensaje: "error al obtener informacion",
+                        });
+                    }
+                } else {
+                    res.status(500).json({
+                        mensaje: "error al obtener informacion",
+                    });
+                }
+            } else {
+                res.status(500).json({
+                    mensaje: "error al obtener informacion",
+                });
+            }
+        }
+    } else {
+        res.sendStatus(403)
+    }
+};
+
+messagesController.postSendImage = async (req, res) => {
+
+    const baererHeader = req.headers.authorization;
+    if (typeof baererHeader !== 'undefined') {
+        const baererToken = baererHeader.split(" ")[1]
+        req.token = baererToken;
+        const permission = await permissionJWTVerify(baererToken)
+        if (permission.flag == false) {
+            res.sendStatus(403)
+        } else {
+            let form = new formidable.IncomingForm();
+            form.keepExtensions = true;
+            form.parse(req, async (err, fields, files) => {
+                if (err) {
+                    return res.status(400).json({
+                        error: "Media could not be uploaded",
+                    });
+                }
+                if (!files.file) {
+                    return res.status(400).json({
+                        error: "Media File is required",
+                    });
+                }
+                let isFileValidSize = validateMediaSize(files.file.size, files.file.mimetype);
+                if (!isFileValidSize) {
+                    return res.status(400).json({
+                        error: `Media File size should be less than ${mediaLimits(
+                            files.file.mimetype
+                        )}`,
+                    });
+                }
+                request.post(
+                    {
+                        url: `https://graph.facebook.com/v13.0/112456731683954/media`,
+                        formData: {
+                            file: {
+                                value: fs.createReadStream(files.file.filepath),
+                                options: {
+                                    filename: files.file.name,
+                                    contentType: files.file.mimetype,
+                                },
+                            },
+                            type: files.file.mimetype,
+                            messaging_product: "whatsapp",
+                        },
+                        headers: {
+                            Authorization: `Bearer ` + permission.user.user.messageToken,
+                            "content-type": "multipart/form-data",
+                        },
+                    },
+                    async function (err, resp, body) {
+                        if (err) {
+                            console.log("Error!");
+                        } else {
+                            const idNumber = await getPhoneNumberWhitID(req.query.from, permission.user.user.bussinesAccountId, permission.user.user.messageToken)
+
+                            const bodyAux = JSON.parse(body)
+                            if (idNumber.exist == true) {
+                                try {
+                                    var data = JSON.stringify({
+                                        "messaging_product": "whatsapp",
+                                        "recipient_type": "individual",
+                                        "to": req.query.to,
+                                        "type": "IMAGE",
+                                        "image": {
+                                            "id": bodyAux.id
+                                        }
+                                    });
+                                    var config = {
+                                        method: 'post',
+                                        url: urlMeta.url + idNumber.id + '/messages',
+                                        headers: {
+                                            'Authorization': 'Bearer ' + permission.user.user.messageToken,
+                                            'Content-Type': 'application/json'
+                                        },
+                                        data: data
+                                    };
+                                    axios(config)
+                                        .then(async function (response) {
+                                            res.status(200).json({ mensaje: "enviado" });
+                                        })
+                                        .catch(function (error) {
+                                            res.status(500).json({
+                                                mensaje: "error al obtener informacion",
+                                            });
+                                            console.log(error);
+                                        });
+                                } catch (error) {
+                                    console.log(error);
+                                    res.status(500).json({
+                                        mensaje: "error al obtener informacion",
+                                    });
+                                }
+                            } else {
+                                res.status(500).json({
+                                    mensaje: "error al obtener informacion",
+                                });
+                            }
+
+
+                        }
+                    }
+                );
+            });
+        }
+    }
+
+};
+
+messagesController.postSendImageURL = async (req, res) => {
+    const baererHeader = req.headers.authorization;
+    if (typeof baererHeader !== 'undefined') {
+        const baererToken = baererHeader.split(" ")[1]
+        req.token = baererToken;
+        const permission = await permissionJWTVerify(baererToken)
+        if (permission.flag == false) {
+            res.sendStatus(403)
+        } else {
+            if (req.body.to && req.body.from && req.body.url) {
+                const idNumber = await getPhoneNumberWhitID(req.body.from, permission.user.user.bussinesAccountId, permission.user.user.messageToken)
+                if (idNumber.exist == true) {
+                    try {
+                        var data = JSON.stringify({
+                            "messaging_product": "whatsapp",
+                            "recipient_type": "individual",
+                            "to": req.body.to,
+                            "type": "image",
+                            "image": {
+                                "link": req.body.url
+                            }
+                        });
+
+                        var config = {
+                            method: 'post',
+                            url: urlMeta.url + idNumber.id + '/messages',
+                            headers: {
+                                'Authorization': 'Bearer ' + permission.user.user.messageToken,
+                                'Content-Type': 'application/json'
+                            },
+                            data: data
+                        };
+                        axios(config)
+                            .then(async function (response) {
+                                res.status(200).json({ mensaje: "enviado" });
                             })
                             .catch(function (error) {
                                 res.status(500).json({
