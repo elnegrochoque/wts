@@ -676,6 +676,182 @@ messagesController.postTemplateIssueJWT = async (req, res) => {
     }
 };
 
+messagesController.postTemplateThanksForBuyJWT = async (req, res) => {
+    const baererHeader = req.headers.authorization;
+    if (typeof baererHeader !== 'undefined') {
+        const baererToken = baererHeader.split(" ")[1]
+        req.token = baererToken;
+        const permission = await permissionJWTVerify(baererToken)
+        if (permission.flag == false) {
+            res.sendStatus(403)
+        } else {
+            if (req.body.to && req.body.name && req.body.from && req.body.link) {
+                const idNumber = await getPhoneNumberWhitID(req.body.from, permission.user.user.bussinesAccountId, permission.user.user.messageToken)
+                if (idNumber.exist == true) {
+                    try {
+                        var data = JSON.stringify(
+                            {
+                                "messaging_product": "whatsapp",
+                                "to": req.body.to,
+                                "type": "template",
+                                "template": {
+                                    "name": "sample_purchase_feedback",
+                                    "language": {
+                                        "code": "es",
+                                        "policy": "deterministic"
+                                    },
+                                    "components": [
+                                        {
+                                            "type": "header",
+                                            "parameters": [
+                                                {
+                                                    "type": "image",
+                                                    "image": {
+                                                        "link": req.body.link
+                                                    }
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "type": "body",
+                                            "parameters": [
+                                                {
+                                                    "type": "text",
+                                                    "text": req.body.name
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            }
+                        );
+                        var config = {
+                            method: 'post',
+                            url: urlMeta.url + idNumber.id + '/messages',
+                            headers: {
+                                'Authorization': 'Bearer ' + permission.user.user.messageToken,
+                                'Content-Type': 'application/json'
+                            },
+                            data: data
+                        };
+                        axios(config)
+                            .then(async function (response) {
+                                await phone.findOneAndUpdate({ number: req.body.from }, { $inc: { 'messages': 1 } });
+                                const newMessage = new message({
+                                    message: req.body.text,
+                                    from: req.body.from,
+                                    to: req.body.to,
+                                    whatsappBussinessId: permission.user.user.bussinesAccountId,
+                                    tiendaId: permission.user.user.tiendaId
+                                })
+                                await newMessage.save()
+                                res.status(200).json({ mensaje: "enviado" });
+
+                            })
+                            .catch(function (error) {
+                                res.status(500).json({
+                                    mensaje: "error al obtener informacion",
+                                });
+                                console.log(error);
+                            });
+                    } catch (error) {
+                        console.log(error);
+                        res.status(500).json({
+                            mensaje: "error al obtener informacion",
+                        });
+                    }
+                } else {
+                    res.status(500).json({
+                        mensaje: "error al obtener informacion",
+                    });
+                }
+            } else {
+                res.status(500).json({
+                    mensaje: "error al obtener informacion",
+                });
+            }
+        }
+    } else {
+        res.sendStatus(403)
+    }
+};
+
+messagesController.postTemplateHelloWorldJWT = async (req, res) => {
+    const baererHeader = req.headers.authorization;
+    if (typeof baererHeader !== 'undefined') {
+        const baererToken = baererHeader.split(" ")[1]
+        req.token = baererToken;
+        const permission = await permissionJWTVerify(baererToken)
+        if (permission.flag == false) {
+            res.sendStatus(403)
+        } else {
+            if (req.body.to && req.body.from) {
+                const idNumber = await getPhoneNumberWhitID(req.body.from, permission.user.user.bussinesAccountId, permission.user.user.messageToken)
+                if (idNumber.exist == true) {
+                    try {
+                        var data = JSON.stringify(
+                            {
+                                "messaging_product": "whatsapp",
+                                "to": req.body.to,
+                                "type": "template",
+                                "template": {
+                                    "name": "hello_world",
+                                    "language": {
+                                        "code": "en_US"
+                                    }
+                                }
+                            }
+                        );
+                        var config = {
+                            method: 'post',
+                            url: urlMeta.url + idNumber.id + '/messages',
+                            headers: {
+                                'Authorization': 'Bearer ' + permission.user.user.messageToken,
+                                'Content-Type': 'application/json'
+                            },
+                            data: data
+                        };
+                        axios(config)
+                            .then(async function (response) {
+                                await phone.findOneAndUpdate({ number: req.body.from }, { $inc: { 'messages': 1 } });
+                                const newMessage = new message({
+                                    message: req.body.text,
+                                    from: req.body.from,
+                                    to: req.body.to,
+                                    whatsappBussinessId: permission.user.user.bussinesAccountId,
+                                    tiendaId: permission.user.user.tiendaId
+                                })
+                                await newMessage.save()
+                                res.status(200).json({ mensaje: "enviado" });
+
+                            })
+                            .catch(function (error) {
+                                res.status(500).json({
+                                    mensaje: "error al obtener informacion",
+                                });
+                                console.log(error);
+                            });
+                    } catch (error) {
+                        console.log(error);
+                        res.status(500).json({
+                            mensaje: "error al obtener informacion",
+                        });
+                    }
+                } else {
+                    res.status(500).json({
+                        mensaje: "error al obtener informacion",
+                    });
+                }
+            } else {
+                res.status(500).json({
+                    mensaje: "error al obtener informacion",
+                });
+            }
+        }
+    } else {
+        res.sendStatus(403)
+    }
+};
 messagesController.postSendImage = async (req, res) => {
 
     const baererHeader = req.headers.authorization;
