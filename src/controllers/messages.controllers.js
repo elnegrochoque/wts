@@ -707,7 +707,6 @@ messagesController.postSendImage = async (req, res) => {
                         )}`,
                     });
                 }
-                console.log(files.file.originalFilename)
                 request.post(
                     {
                         url: `https://graph.facebook.com/v13.0/112456731683954/media`,
@@ -732,10 +731,9 @@ messagesController.postSendImage = async (req, res) => {
                             console.log("Error!");
                         } else {
                             const idNumber = await getPhoneNumberWhitID(req.query.from, permission.user.user.bussinesAccountId, permission.user.user.messageToken)
-                            console.log(files.file.mimetype)
+
                             const bodyAux = JSON.parse(body)
                             const fileTypeAux = fileType(files.file.mimetype)
-                            console.log(fileTypeAux)
                             if (idNumber.exist == true) {
                                 try {
                                     const jsonAux = {
@@ -744,7 +742,7 @@ messagesController.postSendImage = async (req, res) => {
                                         "to": req.query.to,
                                         "type": fileTypeAux[0]
                                     }
-                                    if (fileTypeAux[0]=="IMAGE"||fileTypeAux[0]=="VIDEO") {
+                                    if (fileTypeAux[0] == "IMAGE" || fileTypeAux[0] == "VIDEO") {
                                         jsonAux[fileTypeAux[1]] = {
                                             "id": bodyAux.id
                                         }

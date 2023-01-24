@@ -328,9 +328,7 @@ contactController.postCreateContactJWT = async (req, res) => {
 
 contactController.putContactById = async (req, res) => {
     try {
-        console.log("hola")
         const { name, lastName, email, phone, bussinesAccountId, tiendaId, company } = req.body;
-        console.log(name, lastName, email, phone, bussinesAccountId, tiendaId, company)
         if (name && lastName && email && phone && company && bussinesAccountId && tiendaId && isNum(phone)) {
             const newContact = new contact({
                 name: name,
@@ -405,7 +403,7 @@ contactController.putContactByIdJWT = async (req, res) => {
                     } else {                      
                         const { name, lastName, email, phone, company } = req.body;
                         if (name && lastName && email && phone && company && isNum(phone)) {
-                            console.log("hola")
+
                             const newContact = {
                                 name: name,
                                 lastName: lastName,
