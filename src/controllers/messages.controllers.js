@@ -73,6 +73,7 @@ messagesController.getMessageJWT = async (req, res) => {
                         if (req.query.number) {
                             const messageCount = await message.count({ $or: [{ from: { $regex: req.query.number }, whatsappBussinessId: permission.user.user.bussinesAccountId }, { to: { $regex: req.query.number }, whatsappBussinessId: permission.user.user.bussinesAccountId }] });
                             const result = []
+                            result.push({ status: true })
                             result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": messageCount } })
                             const messages = await message.find({ $or: [{ from: { $regex: req.query.number }, whatsappBussinessId: permission.user.user.bussinesAccountId }, { to: { $regex: req.query.number }, whatsappBussinessId: permission.user.user.bussinesAccountId }] }).skip((elements * page) - elements).limit(elements);
                             result.push({ messages: messages })
@@ -81,6 +82,7 @@ messagesController.getMessageJWT = async (req, res) => {
                         if (req.query.from) {
                             const messageCount = await message.count({ from: req.query.from });
                             const result = []
+                            result.push({ status: true })
                             result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": messageCount } })
                             const messages = await message.find({ from: req.query.from }).skip((elements * page) - elements).limit(elements);
                             result.push({ messages: messages })
@@ -89,6 +91,7 @@ messagesController.getMessageJWT = async (req, res) => {
                         if (req.query.to) {
                             const messageCount = await message.count({ to: req.query.to });
                             const result = []
+                            result.push({ status: true })
                             result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": messageCount } })
                             const messages = await message.find({ to: req.query.to }).skip((elements * page) - elements).limit(elements);
                             result.push({ messages: messages })
@@ -97,6 +100,7 @@ messagesController.getMessageJWT = async (req, res) => {
                         if (req.query.all == "true") {
                             const messageCount = await message.count();
                             const result = []
+                            result.push({ status: true })
                             result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": messageCount } })
                             const messages = await message.find().skip((elements * page) - elements).limit(elements);
                             result.push({ messages: messages })
@@ -109,17 +113,20 @@ messagesController.getMessageJWT = async (req, res) => {
                             const end = new Date(endAux[2], endAux[1] - 1, endAux[0])
                             const messageCount = await message.count({ createdAt: { $gte: start, $lt: end } });
                             const result = []
+                            result.push({ status: true })
                             result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": messageCount } })
                             const messages = await message.find({ createdAt: { $gte: start, $lt: end } }).skip((elements * page) - elements).limit(elements);
                             result.push({ messages: messages })
                             res.status(200).json(result);
                         } else {
                             res.status(500).json({
+                                status: false,
                                 mensaje: "error al obtener informacion",
                             });
                         }
                     } else {
                         res.status(500).json({
+                            status: false,
                             mensaje: "error al obtener informacion",
                         });
                     }
@@ -129,6 +136,7 @@ messagesController.getMessageJWT = async (req, res) => {
                         if (req.query.number) {
                             const messageCount = await message.count({ $or: [{ from: { $regex: req.query.number }, whatsappBussinessId: permission.user.user.bussinesAccountId }, { to: { $regex: req.query.number }, whatsappBussinessId: permission.user.user.bussinesAccountId }] });
                             const result = []
+                            result.push({ status: true })
                             result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": messageCount } })
                             const messages = await message.find({ $or: [{ from: { $regex: req.query.number }, whatsappBussinessId: permission.user.user.bussinesAccountId }, { to: { $regex: req.query.number }, whatsappBussinessId: permission.user.user.bussinesAccountId }] }).skip((elements * page) - elements).limit(elements);
                             result.push({ messages: messages })
@@ -138,6 +146,7 @@ messagesController.getMessageJWT = async (req, res) => {
                         if (req.query.from) {
                             const messageCount = await message.count({ from: req.query.from, whatsappBussinessId: permission.user.user.bussinesAccountId });
                             const result = []
+                            result.push({ status: true })
                             result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": messageCount } })
                             const messages = await message.find({ from: req.query.from, whatsappBussinessId: permission.user.user.bussinesAccountId }).skip((elements * page) - elements).limit(elements);
                             result.push({ messages: messages })
@@ -146,6 +155,7 @@ messagesController.getMessageJWT = async (req, res) => {
                         if (req.query.to) {
                             const messageCount = await message.count({ to: req.query.to, whatsappBussinessId: permission.user.user.bussinesAccountId });
                             const result = []
+                            result.push({ status: true })
                             result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": messageCount } })
                             const messages = await message.find({ to: req.query.to, whatsappBussinessId: permission.user.user.bussinesAccountId }).skip((elements * page) - elements).limit(elements);
                             result.push({ messages: messages })
@@ -154,6 +164,7 @@ messagesController.getMessageJWT = async (req, res) => {
                         if (req.query.all == "true") {
                             const messageCount = await message.count({ whatsappBussinessId: permission.user.user.bussinesAccountId });
                             const result = []
+                            result.push({ status: true })
                             result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": messageCount } })
                             const messages = await message.find({ whatsappBussinessId: permission.user.user.bussinesAccountId }).skip((elements * page) - elements).limit(elements);
                             result.push({ messages: messages })
@@ -166,6 +177,7 @@ messagesController.getMessageJWT = async (req, res) => {
                             const end = new Date(endAux[2], endAux[1] - 1, endAux[0])
                             const messageCount = await message.count({ whatsappBussinessId: permission.user.user.bussinesAccountId, createdAt: { $gte: start, $lt: end } });
                             const result = []
+                            result.push({ status: true })
                             result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": messageCount } })
                             const messages = await message.find({ whatsappBussinessId: permission.user.user.bussinesAccountId, createdAt: { $gte: start, $lt: end } }).skip((elements * page) - elements).limit(elements);
                             result.push({ messages: messages })
@@ -174,6 +186,7 @@ messagesController.getMessageJWT = async (req, res) => {
                         if (req.query.tiendaId == "true") {
                             const messageCount = await message.count({ tiendaId: permission.user.user.tiendaId, whatsappBussinessId: permission.user.user.bussinesAccountId });
                             const result = []
+                            result.push({ status: true })
                             result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": messageCount } })
                             const messages = await message.find({ tiendaId: permission.user.user.tiendaId, whatsappBussinessId: permission.user.user.bussinesAccountId }).skip((elements * page) - elements).limit(elements);
                             result.push({ messages: messages })
@@ -181,6 +194,7 @@ messagesController.getMessageJWT = async (req, res) => {
                         }
                     } else {
                         res.status(500).json({
+                            status: false,
                             mensaje: "error al obtener informacion",
                         });
                     }
@@ -189,6 +203,7 @@ messagesController.getMessageJWT = async (req, res) => {
             } catch (error) {
                 console.log(error);
                 res.status(500).json({
+                    status: false,
                     mensaje: "error al obtener informacion",
                 });
             }
@@ -209,6 +224,7 @@ messagesController.getMessage = async (req, res) => {
             if (req.query.from) {
                 const messageCount = await message.count({ from: req.query.from });
                 const result = []
+                result.push({ status: true })
                 result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": messageCount } })
                 const messages = await message.find({ from: req.query.from }).skip((elements * page) - elements).limit(elements);
                 result.push({ messages: messages })
@@ -217,6 +233,7 @@ messagesController.getMessage = async (req, res) => {
             if (req.query.to) {
                 const messageCount = await message.count({ to: req.query.to });
                 const result = []
+                result.push({ status: true })
                 result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": messageCount } })
                 const messages = await message.find({ to: req.query.to }).skip((elements * page) - elements).limit(elements);
                 result.push({ messages: messages })
@@ -225,6 +242,7 @@ messagesController.getMessage = async (req, res) => {
             if (req.query.all == "true") {
                 const messageCount = await message.count();
                 const result = []
+                result.push({ status: true })
                 result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": messageCount } })
                 const messages = await message.find().skip((elements * page) - elements).limit(elements);
                 result.push({ messages: messages })
@@ -233,6 +251,7 @@ messagesController.getMessage = async (req, res) => {
             if (req.query.tiendaId) {
                 const messageCount = await message.count({ tiendaId: req.query.tiendaId });
                 const result = []
+                result.push({ status: true })
                 result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": messageCount } })
                 const messages = await message.find({ tiendaId: req.query.tiendaId }).skip((elements * page) - elements).limit(elements);
                 result.push({ messages: messages })
@@ -240,12 +259,14 @@ messagesController.getMessage = async (req, res) => {
             }
         } else {
             res.status(500).json({
+                status: false,
                 mensaje: "error al obtener informacion",
             });
         }
     } catch (error) {
         console.log(error);
         res.status(500).json({
+            status: false,
             mensaje: "error al obtener informacion",
         });
     }
@@ -294,11 +315,15 @@ messagesController.postTextMessageJWT = async (req, res) => {
                                     tiendaId: permission.user.user.tiendaId
                                 })
                                 await newMessage.save()
-                                res.status(200).json({ mensaje: "enviado" });
+                                res.status(200).json({
+                                    status: true,
+                                    mensaje: "enviado"
+                                });
 
                             })
                             .catch(function (error) {
                                 res.status(500).json({
+                                    status: false,
                                     mensaje: "error al obtener informacion",
                                 });
                                 console.log(error);
@@ -306,16 +331,19 @@ messagesController.postTextMessageJWT = async (req, res) => {
                     } catch (error) {
                         console.log(error);
                         res.status(500).json({
+                            status: false,
                             mensaje: "error al obtener informacion",
                         });
                     }
                 } else {
                     res.status(500).json({
+                        status: false,
                         mensaje: "error al obtener informacion",
                     });
                 }
             } else {
                 res.status(500).json({
+                    status: false,
                     mensaje: "error al obtener informacion",
                 });
             }
@@ -351,11 +379,12 @@ messagesController.postTextMessage = async (req, res) => {
                 };
                 axios(config)
                     .then(async function (response) {
-                        res.status(200).json({ mensaje: "enviado" });
+                        res.status(200).json({ status: true, mensaje: "enviado" });
                         await phone.findOneAndUpdate({ number: req.body.from }, { $inc: { 'messages': 1 } });
                     })
                     .catch(function (error) {
                         res.status(500).json({
+                            status: false,
                             mensaje: "error al obtener informacion",
                         });
                         console.log(error);
@@ -363,16 +392,19 @@ messagesController.postTextMessage = async (req, res) => {
             } catch (error) {
                 console.log(error);
                 res.status(500).json({
+                    status: false,
                     mensaje: "error al obtener informacion",
                 });
             }
         } else {
             res.status(500).json({
+                status: false,
                 mensaje: "error al obtener informacion",
             });
         }
     } else {
         res.status(500).json({
+            status: false,
             mensaje: "error al obtener informacion",
         });
     }
@@ -414,7 +446,7 @@ messagesController.postLocationMessageJWT = async (req, res) => {
                         };
                         axios(config)
                             .then(async function (response) {
-                                res.status(200).json({ mensaje: "enviado" });
+                                res.status(200).json({ status: true, mensaje: "enviado" });
                                 await phone.findOneAndUpdate({ number: req.body.from }, { $inc: { 'messages': 1 } });
                             })
                             .catch(function (error) {
@@ -423,16 +455,19 @@ messagesController.postLocationMessageJWT = async (req, res) => {
                     } catch (error) {
                         console.log(error);
                         res.status(500).json({
+                            status: false,
                             mensaje: "error al obtener informacion",
                         });
                     }
                 } else {
                     res.status(500).json({
+                        status: false,
                         mensaje: "error al obtener informacion",
                     });
                 }
             } else {
                 res.status(500).json({
+                    status: false,
                     mensaje: "error al obtener informacion",
                 });
             }
@@ -448,6 +483,7 @@ messagesController.postLocationMessage = async (req, res) => {
         const phoneNumber = await phone.find({ number: req.body.from });
         if (phoneNumber.message > 2000) {
             res.status(500).json({
+                status: false,
                 mensaje: "maxima cantidad de mensajes alcanzada",
             });
         }
@@ -475,7 +511,7 @@ messagesController.postLocationMessage = async (req, res) => {
                 };
                 axios(config)
                     .then(async function (response) {
-                        res.status(200).json({ mensaje: "enviado" });
+                        res.status(200).json({ status: true, mensaje: "enviado" });
                         await phone.findOneAndUpdate({ number: req.body.from }, { $inc: { 'messages': 1 } });
                     })
                     .catch(function (error) {
@@ -484,16 +520,19 @@ messagesController.postLocationMessage = async (req, res) => {
             } catch (error) {
                 console.log(error);
                 res.status(500).json({
+                    status: false,
                     mensaje: "error al obtener informacion",
                 });
             }
         } else {
             res.status(500).json({
+                status: false,
                 mensaje: "error al obtener informacion",
             });
         }
     } else {
         res.status(500).json({
+            status: false,
             mensaje: "error al obtener informacion",
         });
     }
@@ -518,17 +557,20 @@ messagesController.getAccountPhonesJWT = async (req, res) => {
                 };
                 axios(config)
                     .then(function (response) {
+                        response.data.data.push({ status: true })
                         res.status(200).json(response.data.data);
                     })
                     .catch(function (error) {
                         console.log(error);
                         res.status(500).json({
+                            status: false,
                             mensaje: "error al obtener informacion",
                         });
                     });
             } catch (error) {
                 console.log(error);
                 res.status(500).json({
+                    status: false,
                     mensaje: "error al obtener informacion",
                 });
             }
@@ -550,11 +592,13 @@ messagesController.getAccountPhones = async (req, res) => {
             };
             axios(config)
                 .then(function (response) {
+                    response.data.data.push({ status: true })
                     res.status(200).json(response.data.data);
                 })
                 .catch(function (error) {
                     console.log(error);
                     res.status(500).json({
+                        status: false,
                         mensaje: "error al obtener informacion",
                     });
                 });
@@ -562,6 +606,7 @@ messagesController.getAccountPhones = async (req, res) => {
     } catch (error) {
         console.log(error);
         res.status(500).json({
+            status: false,
             mensaje: "error al obtener informacion",
         });
     }
@@ -645,11 +690,12 @@ messagesController.postTemplateIssueJWT = async (req, res) => {
                                     tiendaId: permission.user.user.tiendaId
                                 })
                                 await newMessage.save()
-                                res.status(200).json({ mensaje: "enviado" });
+                                res.status(200).json({ status: true, mensaje: "enviado" });
 
                             })
                             .catch(function (error) {
                                 res.status(500).json({
+                                    status: false,
                                     mensaje: "error al obtener informacion",
                                 });
                                 console.log(error);
@@ -657,16 +703,19 @@ messagesController.postTemplateIssueJWT = async (req, res) => {
                     } catch (error) {
                         console.log(error);
                         res.status(500).json({
+                            status: false,
                             mensaje: "error al obtener informacion",
                         });
                     }
                 } else {
                     res.status(500).json({
+                        status: false,
                         mensaje: "error al obtener informacion",
                     });
                 }
             } else {
                 res.status(500).json({
+                    status: false,
                     mensaje: "error al obtener informacion",
                 });
             }
@@ -745,11 +794,12 @@ messagesController.postTemplateThanksForBuyJWT = async (req, res) => {
                                     tiendaId: permission.user.user.tiendaId
                                 })
                                 await newMessage.save()
-                                res.status(200).json({ mensaje: "enviado" });
+                                res.status(200).json({ status: true, mensaje: "enviado" });
 
                             })
                             .catch(function (error) {
                                 res.status(500).json({
+                                    status: false,
                                     mensaje: "error al obtener informacion",
                                 });
                                 console.log(error);
@@ -757,16 +807,19 @@ messagesController.postTemplateThanksForBuyJWT = async (req, res) => {
                     } catch (error) {
                         console.log(error);
                         res.status(500).json({
+                            status: false,
                             mensaje: "error al obtener informacion",
                         });
                     }
                 } else {
                     res.status(500).json({
+                        status: false,
                         mensaje: "error al obtener informacion",
                     });
                 }
             } else {
                 res.status(500).json({
+                    status: false,
                     mensaje: "error al obtener informacion",
                 });
             }
@@ -822,11 +875,12 @@ messagesController.postTemplateHelloWorldJWT = async (req, res) => {
                                     tiendaId: permission.user.user.tiendaId
                                 })
                                 await newMessage.save()
-                                res.status(200).json({ mensaje: "enviado" });
+                                res.status(200).json({ status: true, mensaje: "enviado" });
 
                             })
                             .catch(function (error) {
                                 res.status(500).json({
+                                    status: false,
                                     mensaje: "error al obtener informacion",
                                 });
                                 console.log(error);
@@ -834,16 +888,19 @@ messagesController.postTemplateHelloWorldJWT = async (req, res) => {
                     } catch (error) {
                         console.log(error);
                         res.status(500).json({
+                            status: false,
                             mensaje: "error al obtener informacion",
                         });
                     }
                 } else {
                     res.status(500).json({
+                        status: false,
                         mensaje: "error al obtener informacion",
                     });
                 }
             } else {
                 res.status(500).json({
+                    status: false,
                     mensaje: "error al obtener informacion",
                 });
             }
@@ -867,17 +924,20 @@ messagesController.postSendImage = async (req, res) => {
             form.parse(req, async (err, fields, files) => {
                 if (err) {
                     return res.status(400).json({
+                        status: false,
                         error: "Media could not be uploaded",
                     });
                 }
                 if (!files.file) {
                     return res.status(400).json({
+                        status: false,
                         error: "Media File is required",
                     });
                 }
                 let isFileValidSize = validateMediaSize(files.file.size, files.file.mimetype);
                 if (!isFileValidSize) {
                     return res.status(400).json({
+                        status: false,
                         error: `Media File size should be less than ${mediaLimits(
                             files.file.mimetype
                         )}`,
@@ -940,10 +1000,11 @@ messagesController.postSendImage = async (req, res) => {
                                     };
                                     axios(config)
                                         .then(async function (response) {
-                                            res.status(200).json({ mensaje: "enviado" });
+                                            res.status(200).json({ status: true, mensaje: "enviado" });
                                         })
                                         .catch(function (error) {
                                             res.status(500).json({
+                                                status: false,
                                                 mensaje: "error al obtener informacion",
                                             });
                                             console.log(error);
@@ -951,11 +1012,13 @@ messagesController.postSendImage = async (req, res) => {
                                 } catch (error) {
                                     console.log(error);
                                     res.status(500).json({
+                                        status: false,
                                         mensaje: "error al obtener informacion",
                                     });
                                 }
                             } else {
                                 res.status(500).json({
+                                    status: false,
                                     mensaje: "error al obtener informacion",
                                 });
                             }
@@ -1004,10 +1067,11 @@ messagesController.postSendImageURL = async (req, res) => {
                         };
                         axios(config)
                             .then(async function (response) {
-                                res.status(200).json({ mensaje: "enviado" });
+                                res.status(200).json({ status: true, mensaje: "enviado" });
                             })
                             .catch(function (error) {
                                 res.status(500).json({
+                                    status: false,
                                     mensaje: "error al obtener informacion",
                                 });
                                 console.log(error);
@@ -1015,16 +1079,19 @@ messagesController.postSendImageURL = async (req, res) => {
                     } catch (error) {
                         console.log(error);
                         res.status(500).json({
+                            status: false,
                             mensaje: "error al obtener informacion",
                         });
                     }
                 } else {
                     res.status(500).json({
+                        status: false,
                         mensaje: "error al obtener informacion",
                     });
                 }
             } else {
                 res.status(500).json({
+                    status: false,
                     mensaje: "error al obtener informacion",
                 });
             }

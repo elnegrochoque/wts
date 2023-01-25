@@ -8,10 +8,12 @@ function isNum(val) {
 phonesController.getPhonesAll = async (req, res) => {
     try {
         const phones = await phone.find();
+        phones.push({ status: true })
         res.status(200).json(phones);
     } catch (error) {
         console.log(error);
         res.status(500).json({
+            status: false,
             mensaje: "error al obtener informacion",
         });
     }
@@ -27,12 +29,14 @@ phonesController.getPhones = async (req, res) => {
                 }
                 const phonesCount = await phone.count({});
                 const result = []
+                result.push({ status: true })
                 result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": phonesCount } })
                 const phones = await phone.find({}).skip((elements * page) - elements).limit(elements);
                 result.push({ phones: phones })
                 res.status(200).json(result);
             } else {
                 res.status(500).json({
+                    status: false,
                     mensaje: "error al obtener paginado",
                 });
             }
@@ -50,6 +54,7 @@ phonesController.getPhones = async (req, res) => {
                     }
                 }
                 const result = []
+                result.push({ status: true })
                 const phonesAux = []
                 result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": phones.length } })
                 for (let index = (parseInt(page) - 1) * parseInt(elements); index < phones.length; index++) {
@@ -64,6 +69,7 @@ phonesController.getPhones = async (req, res) => {
             }
             else {
                 res.status(500).json({
+                    status: false,
                     mensaje: "error al obtener unidad de negocio o pagina",
                 });
             }
@@ -71,6 +77,7 @@ phonesController.getPhones = async (req, res) => {
     } catch (error) {
         console.log(error);
         res.status(500).json({
+            status: false,
             mensaje: "error al obtener informacion",
         });
     }
@@ -95,12 +102,14 @@ phonesController.getPhonesJWT = async (req, res) => {
                             }
                             const phonesCount = await phone.count({});
                             const result = []
+                            result.push({ status: true })
                             result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": phonesCount } })
                             const phones = await phone.find({}).skip((elements * page) - elements).limit(elements);
                             result.push({ phones: phones })
                             res.status(200).json(result);
                         } else {
                             res.status(500).json({
+                                status: false,
                                 mensaje: "permisos insuficientes",
                             });
                         }
@@ -118,6 +127,7 @@ phonesController.getPhonesJWT = async (req, res) => {
                                         const phonesCount = await phone.count({ businessUnit: bu });
                                         const phones = await phone.find({ businessUnit: bu }).skip((elements * page) - elements).limit(elements);
                                         const result = []
+                                        result.push({ status: true })
                                         result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": phonesCount } })
                                         result.push({ phones: phones })
                                         res.status(200).json(result);
@@ -125,6 +135,7 @@ phonesController.getPhonesJWT = async (req, res) => {
                                         const phonesCount = await phone.count({ businessUnit: bu, bussinesAccountId: permission.user.user.bussinesAccountId });
                                         const phones = await phone.find({ businessUnit: bu, bussinesAccountId: permission.user.user.bussinesAccountId }).skip((elements * page) - elements).limit(elements);
                                         const result = []
+                                        result.push({ status: true })
                                         result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": phonesCount } })
                                         result.push({ phones: phones })
                                         res.status(200).json(result);
@@ -136,6 +147,7 @@ phonesController.getPhonesJWT = async (req, res) => {
                                         const phonesCount = await phone.count({ name: { $regex: name, $options: 'i' } });
                                         const phones = await phone.find({ name: { $regex: name, $options: 'i' } }).skip((elements * page) - elements).limit(elements);
                                         const result = []
+                                        result.push({ status: true })
                                         result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": phonesCount } })
                                         result.push({ phones: phones })
                                         res.status(200).json(result);
@@ -143,6 +155,7 @@ phonesController.getPhonesJWT = async (req, res) => {
                                         const phonesCount = await phone.count({ name: { $regex: name, $options: 'i' }, bussinesAccountId: permission.user.user.bussinesAccountId });
                                         const phones = await phone.find({ name: { $regex: name, $options: 'i' }, bussinesAccountId: permission.user.user.bussinesAccountId }).skip((elements * page) - elements).limit(elements);
                                         const result = []
+                                        result.push({ status: true })
                                         result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": phonesCount } })
                                         result.push({ phones: phones })
                                         res.status(200).json(result);
@@ -155,6 +168,7 @@ phonesController.getPhonesJWT = async (req, res) => {
                                         const phonesCount = await phone.count({ email: email });
                                         const phones = await phone.find({ email: email }).skip((elements * page) - elements).limit(elements);
                                         const result = []
+                                        result.push({ status: true })
                                         result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": phonesCount } })
                                         result.push({ phones: phones })
                                         res.status(200).json(result);
@@ -162,6 +176,7 @@ phonesController.getPhonesJWT = async (req, res) => {
                                         const phonesCount = await phone.count({ email: email, bussinesAccountId: permission.user.user.bussinesAccountId });
                                         const phones = await phone.find({ email: email, bussinesAccountId: permission.user.user.bussinesAccountId }).skip((elements * page) - elements).limit(elements);
                                         const result = []
+                                        result.push({ status: true })
                                         result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": phonesCount } })
                                         result.push({ phones: phones })
                                         res.status(200).json(result);
@@ -173,6 +188,7 @@ phonesController.getPhonesJWT = async (req, res) => {
                                         const phonesCount = await phone.count({ phoneNumber: phoneNumber });
                                         const phones = await phone.find({ phoneNumber: phoneNumber }).skip((elements * page) - elements).limit(elements);
                                         const result = []
+                                        result.push({ status: true })
                                         result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": phonesCount } })
                                         result.push({ phones: phones })
                                         res.status(200).json(result);
@@ -180,6 +196,7 @@ phonesController.getPhonesJWT = async (req, res) => {
                                         const phonesCount = await phone.count({ phoneNumber: phoneNumber, bussinesAccountId: permission.user.user.bussinesAccountId });
                                         const phones = await phone.find({ phoneNumber: phoneNumber, bussinesAccountId: permission.user.user.bussinesAccountId }).skip((elements * page) - elements).limit(elements);
                                         const result = []
+                                        result.push({ status: true })
                                         result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": phonesCount } })
                                         result.push({ phones: phones })
                                         res.status(200).json(result);
@@ -191,6 +208,7 @@ phonesController.getPhonesJWT = async (req, res) => {
                                         const phonesCount = await phone.count({ tiendaId: permission.user.user.tiendaId });
                                         const phones = await phone.find({ tiendaId: permission.user.user.tiendaId }).skip((elements * page) - elements).limit(elements);
                                         const result = []
+                                        result.push({ status: true })
                                         result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": phonesCount } })
                                         result.push({ phones: phones })
                                         res.status(200).json(result);
@@ -198,6 +216,7 @@ phonesController.getPhonesJWT = async (req, res) => {
                                         const phonesCount = await phone.count({ tiendaId: permission.user.user.tiendaId, bussinesAccountId: permission.user.user.bussinesAccountId });
                                         const phones = await phone.find({ tiendaId: permission.user.user.tiendaId, bussinesAccountId: permission.user.user.bussinesAccountId }).skip((elements * page) - elements).limit(elements);
                                         const result = []
+                                        result.push({ status: true })
                                         result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": phonesCount } })
                                         result.push({ phones: phones })
                                         res.status(200).json(result);
@@ -209,6 +228,7 @@ phonesController.getPhonesJWT = async (req, res) => {
                                         const phonesCount = await phone.count({ bussinesAccountId: bussinesAccountId });
                                         const phones = await phone.find({ bussinesAccountId: bussinesAccountId }).skip((elements * page) - elements).limit(elements);
                                         const result = []
+                                        result.push({ status: true })
                                         result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": phonesCount } })
                                         result.push({ phones: phones })
                                         res.status(200).json(result);
@@ -216,6 +236,7 @@ phonesController.getPhonesJWT = async (req, res) => {
                                         const phonesCount = await phone.count({ bussinesAccountId: permission.user.user.bussinesAccountId });
                                         const phones = await phone.find({ bussinesAccountId: permission.user.user.bussinesAccountId }).skip((elements * page) - elements).limit(elements);
                                         const result = []
+                                        result.push({ status: true })
                                         result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": phonesCount } })
                                         result.push({ phones: phones })
                                         res.status(200).json(result);
@@ -225,11 +246,13 @@ phonesController.getPhonesJWT = async (req, res) => {
                             }
                             else {
                                 res.status(500).json({
+                                    status: false,
                                     mensaje: "error al obtener paginado",
                                 });
                             }
                         } else {
                             res.status(500).json({
+                                status: false,
                                 mensaje: "permisos insuficientes",
                             });
                         }
@@ -239,6 +262,7 @@ phonesController.getPhonesJWT = async (req, res) => {
                 } catch (error) {
                     console.log(error);
                     res.status(500).json({
+                        status: false,
                         mensaje: "error al obtener informacion",
                     });
                 }
@@ -249,6 +273,7 @@ phonesController.getPhonesJWT = async (req, res) => {
     } catch (error) {
         console.log(error);
         res.status(500).json({
+            status: false,
             mensaje: "error al obtener informacion",
         });
     }
@@ -271,10 +296,12 @@ phonesController.postCreatePhone = async (req, res) => {
             });
             await newPhone.save();
             res.status(201).json({
+                status: true,
                 mensaje: "Teléfono agregado",
             });
         } else {
             res.status(500).json({
+                status: false,
                 mensaje: "Problemas al crear el teléfono",
             });
         }
@@ -282,10 +309,12 @@ phonesController.postCreatePhone = async (req, res) => {
         console.log(error);
         if (error.code && error.code == 11000) {
             res.status(500).json({
+                status: false,
                 mensaje: "Ya existe el numero",
             });
         } else {
             res.status(500).json({
+                status: false,
                 mensaje: "Problemas al crear el teléfono",
             });
         }
@@ -321,6 +350,7 @@ phonesController.postCreatePhoneJWT = async (req, res) => {
                         });
                         await newPhone.save();
                         res.status(201).json({
+                            status: true,
                             mensaje: "Teléfono agregado",
                         });
                     } else {
@@ -339,10 +369,12 @@ phonesController.postCreatePhoneJWT = async (req, res) => {
                             });
                             await newPhone.save();
                             res.status(201).json({
+                                status: true,
                                 mensaje: "Teléfono agregado",
                             });
                         } else {
                             res.status(500).json({
+                                status: false,
                                 mensaje: "Problemas al crear el teléfono",
                             });
                         }
@@ -351,10 +383,12 @@ phonesController.postCreatePhoneJWT = async (req, res) => {
                     console.log(error);
                     if (error.code && error.code == 11000) {
                         res.status(500).json({
+                            status: false,
                             mensaje: "Ya existe el numero",
                         });
                     } else {
                         res.status(500).json({
+                            status: false,
                             mensaje: "Problemas al crear el teléfono",
                         });
                     }
@@ -366,6 +400,7 @@ phonesController.postCreatePhoneJWT = async (req, res) => {
     } catch (error) {
         console.log(error);
         res.status(500).json({
+            status: false,
             mensaje: "error al obtener informacion",
         });
     }
@@ -400,9 +435,11 @@ phonesController.getPhoneHitsJWT = async (req, res) => {
                             //    await phone.findOneAndUpdate({ number: phones[0].number }, { $inc: { 'hits': 1 } });
                             //}
                         }
+                        phones.push({ status: true })
                         res.status(200).json(phones);
                     } else {
                         res.status(500).json({
+                            status: false,
                             mensaje: "error al obtener unidad de negocio",
                         });
                     }
@@ -410,6 +447,7 @@ phonesController.getPhoneHitsJWT = async (req, res) => {
                 } catch (error) {
                     console.log(error);
                     res.status(500).json({
+                        status: false,
                         mensaje: "error al obtener informacion",
                     });
                 }
@@ -421,6 +459,7 @@ phonesController.getPhoneHitsJWT = async (req, res) => {
     } catch (error) {
         console.log(error);
         res.status(500).json({
+            status: false,
             mensaje: "error al obtener informacion",
         });
     }
@@ -446,15 +485,18 @@ phonesController.getPhoneHits = async (req, res) => {
                 //    await phone.findOneAndUpdate({ number: phones[0].number }, { $inc: { 'hits': 1 } });
                 //}
             }
+            phones.push({ status: true })
             res.status(200).json(phones);
         } else {
             res.status(500).json({
+                status: false,
                 mensaje: "error al obtener unidad de negocio",
             });
         }
     } catch (error) {
         console.log(error);
         res.status(500).json({
+            status: false,
             mensaje: "error al obtener informacion",
         });
     }
@@ -474,10 +516,12 @@ phonesController.putPhone = async (req, res) => {
         const updatePhone = await phone.findOneAndUpdate({ phoneNumber: oldNumber }, newPhone, { useFindAndModify: true });
         if (updatePhone == null) {
             res.status(201).json({
+                status: false,
                 mensaje: "Teléfono inexistente",
             });
         } else {
             res.status(201).json({
+                status: true,
                 mensaje: "Teléfono modificado",
             });
         }
@@ -485,6 +529,7 @@ phonesController.putPhone = async (req, res) => {
     } catch (error) {
         console.log(error);
         res.status(500).json({
+            status: false,
             mensaje: "Problemas al modificar el teléfono",
         });
     }
@@ -514,10 +559,12 @@ phonesController.putPhoneJWT = async (req, res) => {
                     const updatePhone = await phone.findOneAndUpdate({ phoneNumber: oldNumber }, newPhone, { useFindAndModify: true });
                     if (updatePhone == null) {
                         res.status(201).json({
+                            status: false,
                             mensaje: "Teléfono inexistente",
                         });
                     } else {
                         res.status(201).json({
+                            status: true,
                             mensaje: "Teléfono modificado",
                         });
                     }
@@ -525,6 +572,7 @@ phonesController.putPhoneJWT = async (req, res) => {
                 } catch (error) {
                     console.log(error);
                     res.status(500).json({
+                        status: false,
                         mensaje: "Problemas al modificar el teléfono",
                     });
                 }
@@ -535,6 +583,7 @@ phonesController.putPhoneJWT = async (req, res) => {
     } catch (error) {
         console.log(error);
         res.status(500).json({
+            status: false,
             mensaje: "error al obtener informacion",
         });
     }
@@ -555,16 +604,19 @@ phonesController.putPhoneById = async (req, res) => {
         const updatePhone = await phone.findOneAndUpdate({ _id: req.params.id }, newPhone, { useFindAndModify: true });
         if (updatePhone == null) {
             res.status(201).json({
+                status: false,
                 mensaje: "Teléfono inexistente",
             });
         } else {
             res.status(201).json({
+                status: true,
                 mensaje: "Teléfono modificado",
             });
         }
     } catch (error) {
         console.log(error);
         res.status(500).json({
+            status: false,
             mensaje: "Problemas al modificar el teléfono",
         });
     }
@@ -597,10 +649,12 @@ phonesController.putPhoneByIdJWT = async (req, res) => {
                         const updatePhone = await phone.findOneAndUpdate({ _id: req.params.id, bussinesAccountId: permission.user.user.bussinesAccountId }, newPhone, { useFindAndModify: true });
                         if (updatePhone == null) {
                             res.status(201).json({
+                                status: false,
                                 mensaje: "Teléfono inexistente",
                             });
                         } else {
                             res.status(201).json({
+                                status: true,
                                 mensaje: "Teléfono modificado",
                             });
                         }
@@ -619,10 +673,12 @@ phonesController.putPhoneByIdJWT = async (req, res) => {
                         const updatePhone = await phone.findOneAndUpdate({ _id: req.params.id, bussinesAccountId: permission.user.user.bussinesAccountId }, newPhone, { useFindAndModify: true });
                         if (updatePhone == null) {
                             res.status(201).json({
+                                status: false,
                                 mensaje: "Teléfono inexistente",
                             });
                         } else {
                             res.status(201).json({
+                                status: true,
                                 mensaje: "Teléfono modificado",
                             });
                         }
@@ -631,6 +687,7 @@ phonesController.putPhoneByIdJWT = async (req, res) => {
                 } catch (error) {
                     console.log(error);
                     res.status(500).json({
+                        status: false,
                         mensaje: "Problemas al modificar el teléfono",
                     });
                 }
@@ -641,6 +698,7 @@ phonesController.putPhoneByIdJWT = async (req, res) => {
     } catch (error) {
         console.log(error);
         res.status(500).json({
+            status: false,
             mensaje: "error al obtener informacion",
         });
     }
@@ -660,16 +718,19 @@ phonesController.deletePhoneJWT = async (req, res) => {
                     const deletePhone = await phone.deleteOne({ phoneNumber: oldNumber });
                     if (deletePhone.deletedCount > 0) {
                         res.status(201).json({
+                            status: true,
                             mensaje: "Teléfono eliminado",
                         });
                     } else {
                         res.status(201).json({
+                            status: false,
                             mensaje: "Teléfono no encontrado",
                         });
                     }
                 } catch (error) {
                     console.log(error);
                     res.status(500).json({
+                        status: false,
                         mensaje: "Problemas al elminar el teléfono",
                     });
                 }
@@ -680,6 +741,7 @@ phonesController.deletePhoneJWT = async (req, res) => {
     } catch (error) {
         console.log(error);
         res.status(500).json({
+            status: false,
             mensaje: "error al obtener informacion",
         });
     }
@@ -691,16 +753,19 @@ phonesController.deletePhone = async (req, res) => {
         const deletePhone = await phone.deleteOne({ phoneNumber: oldNumber });
         if (deletePhone.deletedCount > 0) {
             res.status(201).json({
+                status: true,
                 mensaje: "Teléfono eliminado",
             });
         } else {
             res.status(201).json({
+                status: false,
                 mensaje: "Teléfono no encontrado",
             });
         }
     } catch (error) {
         console.log(error);
         res.status(500).json({
+            status: false,
             mensaje: "Problemas al modificar el teléfono",
         });
     }
@@ -723,10 +788,12 @@ phonesController.deletePhoneByIdJWT = async (req, res) => {
                         const deletePhone = await phone.deleteOne({ _id: req.params.id });
                         if (deletePhone.deletedCount > 0) {
                             res.status(201).json({
+                                status: true,
                                 mensaje: "Teléfono eliminado",
                             });
                         } else {
                             res.status(201).json({
+                                status: false,
                                 mensaje: "Teléfono no encontrado",
                             });
                         }
@@ -734,10 +801,12 @@ phonesController.deletePhoneByIdJWT = async (req, res) => {
                         const deletePhone = await phone.deleteOne({ _id: req.params.id, bussinesAccountId: permission.user.user.bussinesAccountId });
                         if (deletePhone.deletedCount > 0) {
                             res.status(201).json({
+                                status: true,
                                 mensaje: "Teléfono eliminado",
                             });
                         } else {
                             res.status(201).json({
+                                status: false,
                                 mensaje: "Teléfono no encontrado",
                             });
                         }
@@ -745,6 +814,7 @@ phonesController.deletePhoneByIdJWT = async (req, res) => {
                 } catch (error) {
                     console.log(error);
                     res.status(500).json({
+                        status: false,
                         mensaje: "Problemas al elminar el teléfono",
                     });
                 }
@@ -755,6 +825,7 @@ phonesController.deletePhoneByIdJWT = async (req, res) => {
     } catch (error) {
         console.log(error);
         res.status(500).json({
+            status: false,
             mensaje: "error al obtener informacion",
         });
     }
@@ -765,16 +836,19 @@ phonesController.deletePhoneById = async (req, res) => {
         const deletePhone = await phone.deleteOne({ _id: req.params.id });
         if (deletePhone.deletedCount > 0) {
             res.status(201).json({
+                status: true,
                 mensaje: "Teléfono eliminado",
             });
         } else {
             res.status(201).json({
+                status: false,
                 mensaje: "Teléfono no encontrado",
             });
         }
     } catch (error) {
         console.log(error);
         res.status(500).json({
+            status: false,
             mensaje: "Problemas al modificar el teléfono",
         });
     }
@@ -783,10 +857,12 @@ phonesController.getPhone = async (req, res) => {
     try {
         const id = req.params.id
         const objectPhone = await phone.findById(id)
+        objectPhone.push({ status: true })
         res.status(200).json(objectPhone);
     } catch (error) {
         console.log(error);
         res.status(500).json({
+            status: false,
             mensaje: "error al obtener informacion",
         });
     }
@@ -807,15 +883,18 @@ phonesController.getPhoneJWT = async (req, res) => {
                     if (permission.user.user.permisions.find(permissionsAux => permissionsAux === 'admin')) {
                         const id = req.params.id
                         const objectPhone = await phone.findById(id);
+                        objectPhone.push({ status: true })
                         res.status(200).json(objectPhone);
                     } else {
                         const id = req.params.id
                         const objectPhone = await phone.find({ _id: id, bussinesAccountId: permission.user.user.bussinesAccountId });
+                        objectPhone.push({ status: true })
                         res.status(200).json(objectPhone);
                     }
                 } catch (error) {
                     console.log(error);
                     res.status(500).json({
+                        status: false,
                         mensaje: "error al obtener informacion",
                     });
                 }
@@ -826,6 +905,7 @@ phonesController.getPhoneJWT = async (req, res) => {
     } catch (error) {
         console.log(error);
         res.status(500).json({
+            status: false,
             mensaje: "error al obtener informacion",
         });
     }

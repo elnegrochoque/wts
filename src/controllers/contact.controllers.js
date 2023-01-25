@@ -1,7 +1,4 @@
 
-import message from "../models/messages.models.js";
-import { urlMeta } from "../config.js";
-import axios from "axios";
 import { permissionJWTVerify } from "./jwt.controllers.js";
 import contact from "../models/contacts.models.js";
 
@@ -32,12 +29,14 @@ contactController.getContactsJWT = async (req, res) => {
                             }
                             const contactCount = await contact.count({});
                             const result = []
+                            result.push({ status: true })
                             result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": contactCount } })
                             const contacts = await contact.find({}).skip((elements * page) - elements).limit(elements);
                             result.push({ contact: contacts })
                             res.status(200).json(result);
                         } else {
                             res.status(500).json({
+                                status: false,
                                 mensaje: "permisos insuficientes",
                             });
                         }
@@ -55,6 +54,7 @@ contactController.getContactsJWT = async (req, res) => {
                                         const contactCount = await contact.count({ lastName: { $regex: lastName, $options: 'i' } });
                                         const contacts = await contact.find({ lastName: { $regex: lastName, $options: 'i' } }).skip((elements * page) - elements).limit(elements);
                                         const result = []
+                                        result.push({ status: true })
                                         result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": contactCount } })
                                         result.push({ contacts: contacts })
                                         res.status(200).json(result);
@@ -62,6 +62,7 @@ contactController.getContactsJWT = async (req, res) => {
                                         const contactsCount = await contact.count({ lastName: { $regex: lastName, $options: 'i' }, bussinesAccountId: permission.user.user.bussinesAccountId });
                                         const contacts = await contact.find({ lastName: { $regex: lastName, $options: 'i' }, bussinesAccountId: permission.user.user.bussinesAccountId }).skip((elements * page) - elements).limit(elements);
                                         const result = []
+                                        result.push({ status: true })
                                         result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": contactsCount } })
                                         result.push({ contacts: contacts })
                                         res.status(200).json(result);
@@ -73,6 +74,7 @@ contactController.getContactsJWT = async (req, res) => {
                                         const contactCount = await contact.count({ company: { $regex: company, $options: 'i' } });
                                         const contacts = await contact.find({ company: { $regex: company, $options: 'i' } }).skip((elements * page) - elements).limit(elements);
                                         const result = []
+                                        result.push({ status: true })
                                         result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": contactCount } })
                                         result.push({ contacts: contacts })
                                         res.status(200).json(result);
@@ -80,6 +82,7 @@ contactController.getContactsJWT = async (req, res) => {
                                         const contactsCount = await contact.count({ company: { $regex: company, $options: 'i' }, bussinesAccountId: permission.user.user.bussinesAccountId });
                                         const contacts = await contact.find({ company: { $regex: company, $options: 'i' }, bussinesAccountId: permission.user.user.bussinesAccountId }).skip((elements * page) - elements).limit(elements);
                                         const result = []
+                                        result.push({ status: true })
                                         result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": contactsCount } })
                                         result.push({ contacts: contacts })
                                         res.status(200).json(result);
@@ -91,6 +94,7 @@ contactController.getContactsJWT = async (req, res) => {
                                         const contactsCount = await contact.count({ name: { $regex: name, $options: 'i' } });
                                         const contacts = await contact.find({ name: { $regex: name, $options: 'i' } }).skip((elements * page) - elements).limit(elements);
                                         const result = []
+                                        result.push({ status: true })
                                         result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": contactsCount } })
                                         result.push({ contacts: contacts })
                                         res.status(200).json(result);
@@ -98,6 +102,7 @@ contactController.getContactsJWT = async (req, res) => {
                                         const contactsCount = await contact.count({ name: { $regex: name, $options: 'i' }, bussinesAccountId: permission.user.user.bussinesAccountId });
                                         const contacts = await contact.find({ name: { $regex: name, $options: 'i' }, bussinesAccountId: permission.user.user.bussinesAccountId }).skip((elements * page) - elements).limit(elements);
                                         const result = []
+                                        result.push({ status: true })
                                         result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": contactsCount } })
                                         result.push({ contacts: contacts })
                                         res.status(200).json(result);
@@ -110,6 +115,7 @@ contactController.getContactsJWT = async (req, res) => {
                                         const contactsCount = await contact.count({ email: email });
                                         const contacts = await contact.find({ email: email }).skip((elements * page) - elements).limit(elements);
                                         const result = []
+                                        result.push({ status: true })
                                         result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": contactsCount } })
                                         result.push({ contacts: contacts })
                                         res.status(200).json(result);
@@ -117,6 +123,7 @@ contactController.getContactsJWT = async (req, res) => {
                                         const contactsCount = await contact.count({ email: email, bussinesAccountId: permission.user.user.bussinesAccountId });
                                         const contacts = await contact.find({ email: email, bussinesAccountId: permission.user.user.bussinesAccountId }).skip((elements * page) - elements).limit(elements);
                                         const result = []
+                                        result.push({ status: true })
                                         result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": contactsCount } })
                                         result.push({ contacts: contacts })
                                         res.status(200).json(result);
@@ -128,6 +135,7 @@ contactController.getContactsJWT = async (req, res) => {
                                         const contactsCount = await contact.count({ phone: phone });
                                         const contacts = await contact.find({ phone: phone }).skip((elements * page) - elements).limit(elements);
                                         const result = []
+                                        result.push({ status: true })
                                         result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": contactsCount } })
                                         result.push({ contacts: contacts })
                                         res.status(200).json(result);
@@ -135,6 +143,7 @@ contactController.getContactsJWT = async (req, res) => {
                                         const contactsCount = await contact.count({ phone: phone, bussinesAccountId: permission.user.user.bussinesAccountId });
                                         const contacts = await contact.find({ phone: phone, bussinesAccountId: permission.user.user.bussinesAccountId }).skip((elements * page) - elements).limit(elements);
                                         const result = []
+                                        result.push({ status: true })
                                         result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": contactsCount } })
                                         result.push({ contacts: contacts })
                                         res.status(200).json(result);
@@ -146,6 +155,7 @@ contactController.getContactsJWT = async (req, res) => {
                                         const contactsCount = await contact.count({ tiendaId: permission.user.user.tiendaId });
                                         const contacts = await contact.find({ tiendaId: permission.user.user.tiendaId }).skip((elements * page) - elements).limit(elements);
                                         const result = []
+                                        result.push({ status: true })
                                         result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": contactsCount } })
                                         result.push({ contacts: contacts })
                                         res.status(200).json(result);
@@ -153,6 +163,7 @@ contactController.getContactsJWT = async (req, res) => {
                                         const contactsCount = await contact.count({ tiendaId: permission.user.user.tiendaId, bussinesAccountId: permission.user.user.bussinesAccountId });
                                         const contacts = await contact.find({ tiendaId: permission.user.user.tiendaId, bussinesAccountId: permission.user.user.bussinesAccountId }).skip((elements * page) - elements).limit(elements);
                                         const result = []
+                                        result.push({ status: true })
                                         result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": contactsCount } })
                                         result.push({ contacts: contacts })
                                         res.status(200).json(result);
@@ -164,6 +175,7 @@ contactController.getContactsJWT = async (req, res) => {
                                         const contactsCount = await contact.count({ bussinesAccountId: bussinesAccountId });
                                         const contacts = await contact.find({ bussinesAccountId: bussinesAccountId }).skip((elements * page) - elements).limit(elements);
                                         const result = []
+                                        result.push({ status: true })
                                         result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": contactsCount } })
                                         result.push({ contacts: contacts })
                                         res.status(200).json(result);
@@ -171,6 +183,7 @@ contactController.getContactsJWT = async (req, res) => {
                                         const contactsCount = await contact.count({ bussinesAccountId: permission.user.user.bussinesAccountId });
                                         const contacts = await contact.find({ bussinesAccountId: permission.user.user.bussinesAccountId }).skip((elements * page) - elements).limit(elements);
                                         const result = []
+                                        result.push({ status: true })
                                         result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": contactsCount } })
                                         result.push({ contacts: contacts })
                                         res.status(200).json(result);
@@ -180,11 +193,13 @@ contactController.getContactsJWT = async (req, res) => {
                             }
                             else {
                                 res.status(500).json({
+                                    status: false,
                                     mensaje: "error al obtener paginado",
                                 });
                             }
                         } else {
                             res.status(500).json({
+                                status: false,
                                 mensaje: "permisos insuficientes",
                             });
                         }
@@ -194,6 +209,7 @@ contactController.getContactsJWT = async (req, res) => {
                 } catch (error) {
                     console.log(error);
                     res.status(500).json({
+                        status: false,
                         mensaje: "error al obtener informacion",
                     });
                 }
@@ -204,6 +220,7 @@ contactController.getContactsJWT = async (req, res) => {
     } catch (error) {
         console.log(error);
         res.status(500).json({
+            status: false,
             mensaje: "error al obtener informacion",
         });
     }
@@ -224,10 +241,12 @@ contactController.postCreateContact = async (req, res) => {
             });
             await newContact.save();
             res.status(201).json({
+                status: true,
                 mensaje: "Contacto agregado",
             });
         } else {
             res.status(500).json({
+                status: false,
                 mensaje: "Problemas al crear el contacto",
             });
         }
@@ -235,10 +254,12 @@ contactController.postCreateContact = async (req, res) => {
         console.log(error);
         if (error.code && error.code == 11000) {
             res.status(500).json({
+                status: false,
                 mensaje: "Ya existe el contacto",
             });
         } else {
             res.status(500).json({
+                status: false,
                 mensaje: "Problemas al crear el Contacto",
             });
         }
@@ -272,10 +293,12 @@ contactController.postCreateContactJWT = async (req, res) => {
                             });
                             await newContact.save();
                             res.status(201).json({
+                                status: true,
                                 mensaje: "Contacto agregado",
                             });
                         } else {
                             res.status(500).json({
+                                status: false,
                                 mensaje: "Problemas al crear el contacto",
                             });
                         }
@@ -293,10 +316,12 @@ contactController.postCreateContactJWT = async (req, res) => {
                             });
                             await newcontact.save();
                             res.status(201).json({
+                                status: true,
                                 mensaje: "Contacto agregado",
                             });
                         } else {
                             res.status(500).json({
+                                status: false,
                                 mensaje: "Problemas al crear el contacto",
                             });
                         }
@@ -305,10 +330,12 @@ contactController.postCreateContactJWT = async (req, res) => {
                     console.log(error);
                     if (error.code && error.code == 11000) {
                         res.status(500).json({
+                            status: false,
                             mensaje: "Ya existe el contacto",
                         });
                     } else {
                         res.status(500).json({
+                            status: false,
                             mensaje: "Problemas al crear contacto",
                         });
                     }
@@ -320,6 +347,7 @@ contactController.postCreateContactJWT = async (req, res) => {
     } catch (error) {
         console.log(error);
         res.status(500).json({
+            status: false,
             mensaje: "error al obtener informacion",
         });
     }
@@ -342,21 +370,25 @@ contactController.putContactById = async (req, res) => {
             const updateContact = await contact.findOneAndUpdate({ _id: req.params.id }, newContact, { useFindAndModify: true });
             if (updateContact == null) {
                 res.status(201).json({
+                    status: false,
                     mensaje: "Contacto inexistente",
                 });
             } else {
                 res.status(201).json({
+                    status: true,
                     mensaje: "Contacto modificado",
                 });
             }
         } else {
             res.status(500).json({
+                status: false,
                 mensaje: "Problemas al crear el contacto",
             });
         }
     } catch (error) {
         console.log(error);
         res.status(500).json({
+            status: false,
             mensaje: "Problemas al modificar el Contacto",
         });
     }
@@ -391,16 +423,18 @@ contactController.putContactByIdJWT = async (req, res) => {
                                 const updateContact = await contact.findOneAndUpdate({ _id: req.params.id }, newContact, { useFindAndModify: true });
                                 if (updateContact == null) {
                                     res.status(201).json({
+                                        status: false,
                                         mensaje: "Contacto inexistente",
                                     });
                                 } else {
                                     res.status(201).json({
+                                        status: true,
                                         mensaje: "Contacto modificado",
                                     });
                                 }
                             }
                         }
-                    } else {                      
+                    } else {
                         const { name, lastName, email, phone, company } = req.body;
                         if (name && lastName && email && phone && company && isNum(phone)) {
 
@@ -416,16 +450,19 @@ contactController.putContactByIdJWT = async (req, res) => {
                             const updateContact = await contact.findOneAndUpdate({ _id: req.params.id }, newContact, { useFindAndModify: true });
                             if (updateContact == null) {
                                 res.status(201).json({
+                                    status: false,
                                     mensaje: "Contacto inexistente",
                                 });
                             } else {
                                 res.status(201).json({
+                                    status: true,
                                     mensaje: "Contacto modificado",
                                 });
                             }
                         }
                         else {
                             res.status(500).json({
+                                status: false,
                                 mensaje: "Problemas al modificar el contacto",
                             });
                         }
@@ -435,6 +472,7 @@ contactController.putContactByIdJWT = async (req, res) => {
                 } catch (error) {
                     console.log(error);
                     res.status(500).json({
+                        status: false,
                         mensaje: "Problemas al modificar el contacto",
                     });
                 }
@@ -445,6 +483,7 @@ contactController.putContactByIdJWT = async (req, res) => {
     } catch (error) {
         console.log(error);
         res.status(500).json({
+            status: false,
             mensaje: "error al obtener informacion",
         });
     }
@@ -468,10 +507,12 @@ contactController.deleteContactByIdJWT = async (req, res) => {
                         const deleteContact = await contact.deleteOne({ _id: req.params.id });
                         if (deletePhone.deletedCount > 0) {
                             res.status(201).json({
+                                status: true,
                                 mensaje: "Contacto eliminado",
                             });
                         } else {
                             res.status(201).json({
+                                status: false,
                                 mensaje: "Contacto no encontrado",
                             });
                         }
@@ -479,10 +520,12 @@ contactController.deleteContactByIdJWT = async (req, res) => {
                         const deleteContact = await contact.deleteOne({ _id: req.params.id, bussinesAccountId: permission.user.user.bussinesAccountId });
                         if (deleteContact.deletedCount > 0) {
                             res.status(201).json({
+                                status: true,
                                 mensaje: "Contacto eliminado",
                             });
                         } else {
                             res.status(201).json({
+                                status: false,
                                 mensaje: "Contacto no encontrado",
                             });
                         }
@@ -490,6 +533,7 @@ contactController.deleteContactByIdJWT = async (req, res) => {
                 } catch (error) {
                     console.log(error);
                     res.status(500).json({
+                        status: false,
                         mensaje: "Problemas al elminar el Contacto",
                     });
                 }
@@ -500,6 +544,7 @@ contactController.deleteContactByIdJWT = async (req, res) => {
     } catch (error) {
         console.log(error);
         res.status(500).json({
+            status: false,
             mensaje: "error al obtener informacion",
         });
     }
@@ -510,16 +555,19 @@ contactController.deleteContacById = async (req, res) => {
         const deleteContact = await contact.deleteOne({ _id: req.params.id });
         if (deleteContact.deletedCount > 0) {
             res.status(201).json({
+                status: true,
                 mensaje: "Contacto eliminado",
             });
         } else {
             res.status(201).json({
+                status: false,
                 mensaje: "Contacto no encontrado",
             });
         }
     } catch (error) {
         console.log(error);
         res.status(500).json({
+            status: false,
             mensaje: "Problemas al modificar el contacto",
         });
     }
@@ -542,15 +590,18 @@ contactController.getContactByIdJWT = async (req, res) => {
                     if (permission.user.user.permisions.find(permissionsAux => permissionsAux === 'admin')) {
                         const id = req.params.id
                         const objectContact = await contact.findById(id);
-                        res.status(200).json(objectPhone);
+                        objectContact.push({ status: true })
+                        res.status(200).json( objectContact);
                     } else {
                         const id = req.params.id
                         const objectContact = await contact.find({ _id: id, bussinesAccountId: permission.user.user.bussinesAccountId });
+                        objectContact.push({ status: true })
                         res.status(200).json(objectContact);
                     }
                 } catch (error) {
                     console.log(error);
                     res.status(500).json({
+                        status: false,
                         mensaje: "error al obtener informacion",
                     });
                 }
@@ -561,6 +612,7 @@ contactController.getContactByIdJWT = async (req, res) => {
     } catch (error) {
         console.log(error);
         res.status(500).json({
+            status: false,
             mensaje: "error al obtener informacion",
         });
     }
