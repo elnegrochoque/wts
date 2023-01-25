@@ -867,6 +867,7 @@ phonesController.getPhone = async (req, res) => {
         });
     }
 };
+
 phonesController.getPhoneJWT = async (req, res) => {
     try {
         const baererHeader = req.headers.authorization;
