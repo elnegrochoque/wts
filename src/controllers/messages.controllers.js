@@ -446,8 +446,17 @@ messagesController.postLocationMessageJWT = async (req, res) => {
                         };
                         axios(config)
                             .then(async function (response) {
-                                res.status(200).json({ status: true, mensaje: "enviado" });
+                                const textMessage = "Location: " + "Latitude: " + req.body.latitude + ", Longitude: " + req.body.longitude
+                                const newMessage = new message({
+                                    message: textMessage,
+                                    from: req.body.from,
+                                    to: req.body.to,
+                                    whatsappBussinessId: permission.user.user.bussinesAccountId,
+                                    tiendaId: permission.user.user.tiendaId
+                                })
+                                await newMessage.save()
                                 await phone.findOneAndUpdate({ phoneNumber: req.body.from }, { $inc: { 'messages': 1 } });
+                                res.status(200).json({ status: true, mensaje: "enviado" });
                             })
                             .catch(function (error) {
                                 console.log(error);
