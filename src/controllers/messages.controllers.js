@@ -1025,8 +1025,8 @@ messagesController.postSendImage = async (req, res) => {
                                             const textMessage = "Image" + "name: " + files.file.originalFilename
                                             const newMessage = new message({
                                                 message: textMessage,
-                                                from: req.body.from,
-                                                to: req.body.to,
+                                                from: req.query.from,
+                                                to: req.query.to,
                                                 whatsappBussinessId: permission.user.user.bussinesAccountId,
                                                 tiendaId: permission.user.user.tiendaId
                                             })
