@@ -306,7 +306,7 @@ messagesController.postTextMessageJWT = async (req, res) => {
                         };
                         axios(config)
                             .then(async function (response) {
-                                await phone.findOneAndUpdate({ number: req.body.from }, { $inc: { 'messages': 1 } });
+                                await phone.findOneAndUpdate({ phoneNumber: req.body.from }, { $inc: { 'messages': 1 } });
                                 const newMessage = new message({
                                     message: req.body.text,
                                     from: req.body.from,
@@ -380,7 +380,7 @@ messagesController.postTextMessage = async (req, res) => {
                 axios(config)
                     .then(async function (response) {
                         res.status(200).json({ status: true, mensaje: "enviado" });
-                        await phone.findOneAndUpdate({ number: req.body.from }, { $inc: { 'messages': 1 } });
+                        await phone.findOneAndUpdate({ phoneNumber: req.body.from }, { $inc: { 'messages': 1 } });
                     })
                     .catch(function (error) {
                         res.status(500).json({
@@ -447,7 +447,7 @@ messagesController.postLocationMessageJWT = async (req, res) => {
                         axios(config)
                             .then(async function (response) {
                                 res.status(200).json({ status: true, mensaje: "enviado" });
-                                await phone.findOneAndUpdate({ number: req.body.from }, { $inc: { 'messages': 1 } });
+                                await phone.findOneAndUpdate({ phoneNumber: req.body.from }, { $inc: { 'messages': 1 } });
                             })
                             .catch(function (error) {
                                 console.log(error);
@@ -511,8 +511,18 @@ messagesController.postLocationMessage = async (req, res) => {
                 };
                 axios(config)
                     .then(async function (response) {
+
+                        await phone.findOneAndUpdate({ phoneNumber: req.body.from }, { $inc: { 'messages': 1 } });
+                        const textMessage = "Location: " + "Latitude: " + req.body.latitude + ", Longitude: " + req.body.longitude
+                        const newMessage = new message({
+                            message: textMessage,
+                            from: req.body.from,
+                            to: req.body.to,
+                            whatsappBussinessId: permission.user.user.bussinesAccountId,
+                            tiendaId: permission.user.user.tiendaId
+                        })
+                        await newMessage.save()
                         res.status(200).json({ status: true, mensaje: "enviado" });
-                        await phone.findOneAndUpdate({ number: req.body.from }, { $inc: { 'messages': 1 } });
                     })
                     .catch(function (error) {
                         console.log(error);
@@ -681,9 +691,10 @@ messagesController.postTemplateIssueJWT = async (req, res) => {
                         };
                         axios(config)
                             .then(async function (response) {
-                                await phone.findOneAndUpdate({ number: req.body.from }, { $inc: { 'messages': 1 } });
+                                await phone.findOneAndUpdate({ phoneNumber: req.body.from }, { $inc: { 'messages': 1 } });
+                                const textMessage = "Template: Issue " + "name: " + req.body.name
                                 const newMessage = new message({
-                                    message: req.body.text,
+                                    message: textMessage,
                                     from: req.body.from,
                                     to: req.body.to,
                                     whatsappBussinessId: permission.user.user.bussinesAccountId,
@@ -785,9 +796,10 @@ messagesController.postTemplateThanksForBuyJWT = async (req, res) => {
                         };
                         axios(config)
                             .then(async function (response) {
-                                await phone.findOneAndUpdate({ number: req.body.from }, { $inc: { 'messages': 1 } });
+                                await phone.findOneAndUpdate({ phoneNumber: req.body.from }, { $inc: { 'messages': 1 } });
+                                const textMessage = "Template: ThanksForBuy " + "name: " + req.body.name + ", Link: " + req.body.link
                                 const newMessage = new message({
-                                    message: req.body.text,
+                                    message: textMessage,
                                     from: req.body.from,
                                     to: req.body.to,
                                     whatsappBussinessId: permission.user.user.bussinesAccountId,
@@ -866,16 +878,16 @@ messagesController.postTemplateHelloWorldJWT = async (req, res) => {
                         };
                         axios(config)
                             .then(async function (response) {
-                                await phone.findOneAndUpdate({ number: req.body.from }, { $inc: { 'messages': 1 } });
+                                await phone.findOneAndUpdate({ phoneNumber: req.body.from }, { $inc: { 'messages': 1 } });
+                                const textMessage = "Template: HelloWorld "
                                 const newMessage = new message({
-                                    message: req.body.text,
+                                    message: textMessage,
                                     from: req.body.from,
                                     to: req.body.to,
                                     whatsappBussinessId: permission.user.user.bussinesAccountId,
                                     tiendaId: permission.user.user.tiendaId
                                 })
                                 await newMessage.save()
-                                res.status(200).json({ status: true, mensaje: "enviado" });
 
                             })
                             .catch(function (error) {
@@ -1000,7 +1012,18 @@ messagesController.postSendImage = async (req, res) => {
                                     };
                                     axios(config)
                                         .then(async function (response) {
+                                            await phone.findOneAndUpdate({ phoneNumber: req.body.from }, { $inc: { 'messages': 1 } });
+                                            const textMessage = "Image" + "name: " + files.file.originalFilename
+                                            const newMessage = new message({
+                                                message: textMessage,
+                                                from: req.body.from,
+                                                to: req.body.to,
+                                                whatsappBussinessId: permission.user.user.bussinesAccountId,
+                                                tiendaId: permission.user.user.tiendaId
+                                            })
+                                            await newMessage.save()
                                             res.status(200).json({ status: true, mensaje: "enviado" });
+
                                         })
                                         .catch(function (error) {
                                             res.status(500).json({
@@ -1067,6 +1090,16 @@ messagesController.postSendImageURL = async (req, res) => {
                         };
                         axios(config)
                             .then(async function (response) {
+                                await phone.findOneAndUpdate({ phoneNumber: req.body.from }, { $inc: { 'messages': 1 } });
+                                const textMessage = "Image" + "Link: " + req.body.url
+                                const newMessage = new message({
+                                    message: textMessage,
+                                    from: req.body.from,
+                                    to: req.body.to,
+                                    whatsappBussinessId: permission.user.user.bussinesAccountId,
+                                    tiendaId: permission.user.user.tiendaId
+                                })
+                                await newMessage.save()
                                 res.status(200).json({ status: true, mensaje: "enviado" });
                             })
                             .catch(function (error) {
