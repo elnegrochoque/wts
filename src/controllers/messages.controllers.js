@@ -897,7 +897,7 @@ messagesController.postTemplateHelloWorldJWT = async (req, res) => {
                                     tiendaId: permission.user.user.tiendaId
                                 })
                                 await newMessage.save()
-
+                                res.status(200).json({ status: true, mensaje: "enviado" });
                             })
                             .catch(function (error) {
                                 res.status(500).json({

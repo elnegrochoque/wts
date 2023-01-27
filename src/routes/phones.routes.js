@@ -1,7 +1,7 @@
 import Router from "express";
 import phonesController from "../controllers/phones.controllers.js";
 
-import {OwnJWT } from "../config.js";
+import { OwnJWT } from "../config.js";
 const router = Router();
 
 
@@ -16,6 +16,8 @@ if (OwnJWT.Flag === true) {
     router.route('/phoneshits')
         .get(phonesController.getPhoneHits)
 
+    router.route('/summessages')
+        .get(phonesController.getSumPhoneMessageJWT)
 
 
 } else {

@@ -911,4 +911,109 @@ phonesController.getPhoneJWT = async (req, res) => {
         });
     }
 };
+
+phonesController.getSumPhoneMessageJWT = async (req, res) => {
+    try {
+        const baererHeader = req.headers.authorization;
+        if (typeof baererHeader !== 'undefined') {
+            const baererToken = baererHeader.split(" ")[1]
+            req.token = baererToken;
+            const permission = await permissionJWTVerify(baererToken)
+            if (permission.flag == false || (
+                permission.user.user.permisions.find(permissionsAux => permissionsAux === 'admin') == undefined &&
+                permission.user.user.permisions.find(permissionsAux => permissionsAux === 'view') == undefined)) {
+                res.sendStatus(403)
+            } else {
+                try {
+                    if (req.query.bussinesAccountId == "true") {
+                        if (permission.user.user.permisions.find(permissionsAux => permissionsAux === 'admin')) {
+                            const suma = []
+                            const sum = await phone.aggregate([
+                                {
+                                    "$group": { _id: "$bussinesAccountId", "suma": { $sum: "$messages" } }
+                                }
+                            ])
+                            for (let i = 0; i < sum.length; i++) {
+                                if (sum[i]._id == permission.user.user.bussinesAccountId) {
+                                    suma.push(sum[i])
+                                    i = sum.length
+                                }
+                            }
+                            suma.push({ status: true })
+                            res.status(200).json(suma);
+                        } else {
+                            const suma = []
+                            const sum = await phone.aggregate([
+                                {
+                                    "$group": { _id: "$bussinesAccountId", "suma": { $sum: "$messages" } }
+                                }
+                            ])
+                            for (let i = 0; i < sum.length; i++) {
+                                if (sum[i]._id == permission.user.user.bussinesAccountId) {
+                                    suma.push(sum[i])
+                                    i = sum.length
+                                }
+                            }
+                            suma.push({ status: true })
+                            res.status(200).json(suma);
+                        }
+                    }
+                    if (req.query.tiendaId == "true") {
+                        if (permission.user.user.permisions.find(permissionsAux => permissionsAux === 'admin')) {
+                            const suma = []
+                            const sum = await phone.aggregate([
+                                {
+                                    "$group": { _id: "$tiendaId", "suma": { $sum: "$messages" } }
+                                }
+                            ])
+                            for (let i = 0; i < sum.length; i++) {
+                                if (sum[i]._id == permission.user.user.tiendaId) {
+                                    suma.push(sum[i])
+                                    i = sum.length
+                                }
+                            }
+                            suma.push({ status: true })
+                            res.status(200).json(suma);
+                        } else {
+                            const suma = []
+                            const sum = await phone.aggregate([
+                                {
+                                    "$group": { _id: "$tiendaId", "suma": { $sum: "$messages" } }
+                                }
+                            ])
+                            for (let i = 0; i < sum.length; i++) {
+                                if (sum[i]._id == permission.user.user.tiendaId) {
+                                    suma.push(sum[i])
+                                    i = sum.length
+                                }
+                            }
+                            suma.push({ status: true })
+                            res.status(200).json(suma);
+                        }
+                    } else {
+                        res.status(500).json({
+                            status: false,
+                            mensaje: "error al obtener informacion",
+                        });
+                    }
+
+                } catch (error) {
+                    console.log(error);
+                    res.status(500).json({
+                        status: false,
+                        mensaje: "error al obtener informacion",
+                    });
+                }
+            }
+        } else {
+            res.sendStatus(403)
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: false,
+            mensaje: "error al obtener informacion",
+        });
+    }
+};
 export default phonesController;
