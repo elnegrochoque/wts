@@ -1,6 +1,7 @@
 
 import express from "express";
 import morgan from "morgan";
+import path from "path";
 import "./database.js";
 import cors from "cors";
 import message from "./models/messages.models.js";
@@ -9,12 +10,18 @@ import phonesRoutes from "./routes/phones.routes.js"
 import { PORT, whatsappToken } from "./config.js";
 import phone from "./models/phones.models.js";
 import contactsRoutes from "./routes/contacts.routes.js"
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const app = express();
+app.use(express.json());
 
+app.use(express.static(path.join(__dirname, "../public")));
 app.use(morgan("dev"));
 app.use(cors());
-app.use(express.json());
 app.listen(PORT.PORT, () => console.log("webhook is listening"));
 
 app.post("/webhook", async (req, res) => {

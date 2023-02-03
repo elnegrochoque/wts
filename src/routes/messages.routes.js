@@ -21,6 +21,8 @@ if (OwnJWT.Flag === true) {
         .post(messagesController.postSendImageURL)
     router.route('/messages/accountphones')
         .get(messagesController.getAccountPhonesJWT)
+    router.route('/messages/files/:id')
+        .get(messagesController.getfiles)
 
 }
 else {

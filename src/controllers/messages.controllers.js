@@ -8,6 +8,14 @@ import formidable from "formidable";
 import { fileType, mediaLimits, validateMediaSize } from "./helpers.js";
 import fs from "fs";
 import request from "request";
+import { fileURLToPath } from "url";
+import { dirname, join } from "path";
+import path from "path";
+import { error } from "console";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(dirname(__filename));
+const uploadFolder = path.join(__dirname, '/files');
+
 const messagesController = {};
 
 
@@ -931,7 +939,6 @@ messagesController.postTemplateHelloWorldJWT = async (req, res) => {
     }
 };
 messagesController.postSendImage = async (req, res) => {
-
     const baererHeader = req.headers.authorization;
     if (typeof baererHeader !== 'undefined') {
         const baererToken = baererHeader.split(" ")[1]
@@ -942,6 +949,7 @@ messagesController.postSendImage = async (req, res) => {
         } else {
             let form = new formidable.IncomingForm();
             form.keepExtensions = true;
+            form.uploadDir = uploadFolder
             form.parse(req, async (err, fields, files) => {
                 if (err) {
                     return res.status(400).json({
@@ -964,6 +972,10 @@ messagesController.postSendImage = async (req, res) => {
                         )}`,
                     });
                 }
+                const file = files.file
+
+
+
                 request.post(
                     {
                         url: `https://graph.facebook.com/v13.0/112456731683954/media`,
@@ -986,6 +998,11 @@ messagesController.postSendImage = async (req, res) => {
                     async function (err, resp, body) {
                         if (err) {
                             console.log("Error!");
+                            console.log(err)
+                            return res.status(400).json({
+                                status: false,
+                                error: err,
+                            });
                         } else {
                             const idNumber = await getPhoneNumberWhitID(req.query.from, permission.user.user.bussinesAccountId, permission.user.user.messageToken)
 
@@ -1021,8 +1038,9 @@ messagesController.postSendImage = async (req, res) => {
                                     };
                                     axios(config)
                                         .then(async function (response) {
+
                                             await phone.findOneAndUpdate({ phoneNumber: req.body.from }, { $inc: { 'messages': 1 } });
-                                            const textMessage = "Image" + "name: " + files.file.originalFilename
+                                            const textMessage = "File" + "name: " + files.file.originalFilename
                                             const newMessage = new message({
                                                 message: textMessage,
                                                 from: req.query.from,
@@ -1030,7 +1048,12 @@ messagesController.postSendImage = async (req, res) => {
                                                 whatsappBussinessId: permission.user.user.bussinesAccountId,
                                                 tiendaId: permission.user.user.tiendaId
                                             })
-                                            await newMessage.save()
+                                            const newMessageAux = await newMessage.save()
+                                            const idMessageStringAux = JSON.stringify(newMessageAux._id)
+                                            const idMessageString = idMessageStringAux.slice(1, -1)
+                                            const fileName = encodeURIComponent(idMessageString + "-" + file.originalFilename);
+                                            const fileDirection = join(uploadFolder, fileName)
+                                            fs.renameSync(file.filepath, fileDirection);
                                             res.status(200).json({ status: true, mensaje: "enviado" });
 
                                         })
@@ -1140,6 +1163,28 @@ messagesController.postSendImageURL = async (req, res) => {
         }
     } else {
         res.sendStatus(403)
+    }
+};
+messagesController.getfiles = async (req, res) => {
+    try {
+        const lenghtid = req.params.id.length;
+        var file = uploadFolder + "/" + req.params.id + "-" + req.body.name;
+        return res.status(200).download(file, function (error) {
+            if (error) {
+
+                console.log("Error : ", error)
+                res.status(500).json({
+                    status: false,
+                    mensaje: error,
+                });
+            }
+
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: false,
+            mensaje: error,
+        });
     }
 };
 export default messagesController;
