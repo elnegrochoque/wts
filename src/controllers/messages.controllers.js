@@ -139,7 +139,7 @@ messagesController.getMessageJWT = async (req, res) => {
                         });
                     }
                 } else {
-                    if (req.query.page) {
+                    if (req.query.page && (req.query.number || req.query.files == "true" || req.query.from || req.query.to || (req.query.date == "true" && req.query.start && typeof req.query.start == "string" && req.query.end && typeof req.query.end == "string") || req.query.all == "true" || req.query.tiendaId == "true")) {
                         const page = req.query.page
                         if (req.query.number) {
                             const messageCount = await message.count({ $or: [{ from: { $regex: req.query.number }, whatsappBussinessId: permission.user.user.bussinesAccountId }, { to: { $regex: req.query.number }, whatsappBussinessId: permission.user.user.bussinesAccountId }] });
@@ -150,7 +150,6 @@ messagesController.getMessageJWT = async (req, res) => {
                             result.push({ messages: messages })
                             res.status(200).json(result);
                         }
-
                         if (req.query.from) {
                             const messageCount = await message.count({ from: req.query.from, whatsappBussinessId: permission.user.user.bussinesAccountId });
                             const result = []
@@ -1166,25 +1165,221 @@ messagesController.postSendImageURL = async (req, res) => {
     }
 };
 messagesController.getfiles = async (req, res) => {
-    try {
-        const lenghtid = req.params.id.length;
-        var file = uploadFolder + "/" + req.params.id + "-" + req.body.name;
-        return res.status(200).download(file, function (error) {
-            if (error) {
+    const baererHeader = req.headers.authorization;
+    if (typeof baererHeader !== 'undefined') {
+        const baererToken = baererHeader.split(" ")[1]
+        req.token = baererToken;
+        const permission = await permissionJWTVerify(baererToken)
+        if (permission.flag == false || (
+            permission.user.user.permisions.find(permissionsAux => permissionsAux === 'admin') == undefined &&
+            permission.user.user.permisions.find(permissionsAux => permissionsAux === 'view') == undefined)) {
+            res.sendStatus(403)
+        } else {
+            if (permission.user.user.permisions.find(permissionsAux => permissionsAux === 'admin')) {
+                try {
+                    const messageAux = await message.findById(req.params.id)
+                    const filename = messageAux.message.slice(10)
+                    var file = uploadFolder + "/" + req.params.id + "-" + filename;
+                    return res.status(200).download(file, function (error) {
+                        if (error) {
+                            console.log("Error : ", error)
+                            res.status(500).json({
+                                status: false,
+                                mensaje: "Archivo no encontrado"
+                            });
+                        }
 
-                console.log("Error : ", error)
+                    });
+                } catch (error) {
+                    res.status(500).json({
+                        status: false,
+                        mensaje: "Archivo no encontrado"
+                    });
+                }
+            } else {
+                try {
+                    const messageAux = await message.findOne({ _id: req.params.id, tiendaId: permission.user.user.tiendaId })
+                    const filename = messageAux.message.slice(10)
+                    var file = uploadFolder + "/" + req.params.id + "-" + filename;
+                    return res.status(200).download(file, function (error) {
+                        if (error) {
+                            console.log("Error : ", error)
+                            res.status(500).json({
+                                status: false,
+                                mensaje: "Archivo no encontrado",
+                            });
+                        }
+
+                    });
+                } catch (error) {
+                    console.log("Error : ", error)
+                    res.status(500).json({
+                        status: false,
+                        mensaje: "Archivo no encontrado",
+                    });
+                }
+            }
+        }
+    }
+}
+messagesController.getMessageWhitFilesJWT = async (req, res) => {
+    const baererHeader = req.headers.authorization;
+    if (typeof baererHeader !== 'undefined') {
+        const baererToken = baererHeader.split(" ")[1]
+        req.token = baererToken;
+        const permission = await permissionJWTVerify(baererToken)
+        if (permission.flag == false || (
+            permission.user.user.permisions.find(permissionsAux => permissionsAux === 'admin') == undefined &&
+            permission.user.user.permisions.find(permissionsAux => permissionsAux === 'view') == undefined)) {
+            res.sendStatus(403)
+        } else {
+            try {
+                let elements = 5
+                if (req.query.elements) {
+                    elements = parseInt(req.query.elements)
+                }
+                if (permission.user.user.permisions.find(permissionsAux => permissionsAux === 'admin')) {
+                    if (req.query.page) {
+                        const page = req.query.page
+                        if (req.query.number) {
+                            const messageCount = await message.count({ $or: [{ from: { $regex: req.query.number }, message: { $regex: /^Filename: / } }, { to: { $regex: req.query.number }, message: { $regex: /^Filename: / } }] });
+                            const result = []
+                            result.push({ status: true })
+                            result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": messageCount } })
+                            const messages = await message.find({ $or: [{ from: { $regex: req.query.number }, message: { $regex: /^Filename: / } }, { to: { $regex: req.query.number }, message: { $regex: /^Filename: / } }] }).skip((elements * page) - elements).limit(elements);
+                            result.push({ messages: messages })
+                            res.status(200).json(result);
+                        }
+                        if (req.query.from) {
+                            const messageCount = await message.count({ from: req.query.from, message: { $regex: /^Filename: / } });
+                            const result = []
+                            result.push({ status: true })
+                            result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": messageCount } })
+                            const messages = await message.find({ from: req.query.from, message: { $regex: /^Filename: / } }).skip((elements * page) - elements).limit(elements);
+                            result.push({ messages: messages })
+                            res.status(200).json(result);
+                        }
+                        if (req.query.to) {
+                            const messageCount = await message.count({ to: req.query.to, message: { $regex: /^Filename: / } });
+                            const result = []
+                            result.push({ status: true })
+                            result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": messageCount } })
+                            const messages = await message.find({ to: req.query.to, message: { $regex: /^Filename: / } }).skip((elements * page) - elements).limit(elements);
+                            result.push({ messages: messages })
+                            res.status(200).json(result);
+                        }
+                        if (req.query.all == "true") {
+                            const messageCount = await message.count({ message: { $regex: /^Filename: / }});
+                            const result = []
+                            result.push({ status: true })
+                            result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": messageCount } })
+                            const messages = await message.find().skip((elements * page) - elements).limit(elements);
+                            result.push({ messages: messages, message: { $regex: /^Filename: / } })
+                            res.status(200).json(result);
+                        }
+                        if (req.query.date == "true" && req.query.start && typeof req.query.start == "string" && req.query.end && typeof req.query.end == "string") {
+                            const startAux = req.query.start.split("-")
+                            const endAux = req.query.end.split("-")
+                            const start = new Date(startAux[2], startAux[1] - 1, startAux[0])
+                            const end = new Date(endAux[2], endAux[1] - 1, endAux[0])
+                            const messageCount = await message.count({ createdAt: { $gte: start, $lt: end } , message: { $regex: /^Filename: / }});
+                            const result = []
+                            result.push({ status: true })
+                            result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": messageCount } })
+                            const messages = await message.find({ createdAt: { $gte: start, $lt: end } , message: { $regex: /^Filename: / }}).skip((elements * page) - elements).limit(elements);
+                            result.push({ messages: messages })
+                            res.status(200).json(result);
+                        } else {
+                            res.status(500).json({
+                                status: false,
+                                mensaje: "error al obtener informacion",
+                            });
+                        }
+                    } else {
+                        res.status(500).json({
+                            status: false,
+                            mensaje: "error al obtener informacion",
+                        });
+                    }
+                } else {
+                    if (req.query.page && (req.query.number || req.query.files == "true" || req.query.from || req.query.to || (req.query.date == "true" && req.query.start && typeof req.query.start == "string" && req.query.end && typeof req.query.end == "string") || req.query.all == "true" || req.query.tiendaId == "true")) {
+                        const page = req.query.page
+                        if (req.query.number) {
+                            const messageCount = await message.count({ $or: [{ from: { $regex: req.query.number }, whatsappBussinessId: permission.user.user.bussinesAccountId, message: { $regex: /^Filename: / }}, { to: { $regex: req.query.number }, whatsappBussinessId: permission.user.user.bussinesAccountId , message: { $regex: /^Filename: / }}] });
+                            const result = []
+                            result.push({ status: true })
+                            result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": messageCount } })
+                            const messages = await message.find({ $or: [{ from: { $regex: req.query.number }, whatsappBussinessId: permission.user.user.bussinesAccountId , message: { $regex: /^Filename: / }}, { to: { $regex: req.query.number }, whatsappBussinessId: permission.user.user.bussinesAccountId, message: { $regex: /^Filename: / } }] }).skip((elements * page) - elements).limit(elements);
+                            result.push({ messages: messages })
+                            res.status(200).json(result);
+                        }
+                        if (req.query.from) {
+                            const messageCount = await message.count({ from: req.query.from, whatsappBussinessId: permission.user.user.bussinesAccountId , message: { $regex: /^Filename: / }});
+                            const result = []
+                            result.push({ status: true })
+                            result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": messageCount } })
+                            const messages = await message.find({ from: req.query.from, whatsappBussinessId: permission.user.user.bussinesAccountId , message: { $regex: /^Filename: / }}).skip((elements * page) - elements).limit(elements);
+                            result.push({ messages: messages })
+                            res.status(200).json(result);
+                        }
+                        if (req.query.to) {
+                            const messageCount = await message.count({ to: req.query.to, whatsappBussinessId: permission.user.user.bussinesAccountId , message: { $regex: /^Filename: / }});
+                            const result = []
+                            result.push({ status: true })
+                            result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": messageCount } })
+                            const messages = await message.find({ to: req.query.to, whatsappBussinessId: permission.user.user.bussinesAccountId, message: { $regex: /^Filename: / } }).skip((elements * page) - elements).limit(elements);
+                            result.push({ messages: messages })
+                            res.status(200).json(result);
+                        }
+                        if (req.query.all == "true") {
+                            const messageCount = await message.count({ whatsappBussinessId: permission.user.user.bussinesAccountId , message: { $regex: /^Filename: / }});
+                            const result = []
+                            result.push({ status: true })
+                            result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": messageCount } })
+                            const messages = await message.find({ whatsappBussinessId: permission.user.user.bussinesAccountId, message: { $regex: /^Filename: / } }).skip((elements * page) - elements).limit(elements);
+                            result.push({ messages: messages })
+                            res.status(200).json(result);
+                        }
+                        if (req.query.date == "true" && req.query.start && typeof req.query.start == "string" && req.query.end && typeof req.query.end == "string") {
+                            const startAux = req.query.start.split("-")
+                            const endAux = req.query.end.split("-")
+                            const start = new Date(startAux[2], startAux[1] - 1, startAux[0])
+                            const end = new Date(endAux[2], endAux[1] - 1, endAux[0])
+                            const messageCount = await message.count({message: { $regex: /^Filename: / },whatsappBussinessId: permission.user.user.bussinesAccountId, createdAt: { $gte: start, $lt: end } });
+                            const result = []
+                            result.push({ status: true })
+                            result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": messageCount } })
+                            const messages = await message.find({message: { $regex: /^Filename: / }, whatsappBussinessId: permission.user.user.bussinesAccountId, createdAt: { $gte: start, $lt: end } }).skip((elements * page) - elements).limit(elements);
+                            result.push({ messages: messages })
+                            res.status(200).json(result);
+                        }
+                        if (req.query.tiendaId == "true") {
+                            const messageCount = await message.count({ tiendaId: permission.user.user.tiendaId, whatsappBussinessId: permission.user.user.bussinesAccountId , message: { $regex: /^Filename: / }});
+                            const result = []
+                            result.push({ status: true })
+                            result.push({ pagination: { "page": page, "maxObjectsPerPage": parseInt(elements), "totalObjects": messageCount } })
+                            const messages = await message.find({ tiendaId: permission.user.user.tiendaId, whatsappBussinessId: permission.user.user.bussinesAccountId, message: { $regex: /^Filename: / } }).skip((elements * page) - elements).limit(elements);
+                            result.push({ messages: messages })
+                            res.status(200).json(result);
+                        }
+                    } else {
+                        res.status(500).json({
+                            status: false,
+                            mensaje: "error al obtener informacion",
+                        });
+                    }
+                }
+
+            } catch (error) {
+                console.log(error);
                 res.status(500).json({
                     status: false,
-                    mensaje: error,
+                    mensaje: "error al obtener informacion",
                 });
             }
-
-        });
-    } catch (error) {
-        res.status(500).json({
-            status: false,
-            mensaje: error,
-        });
+        }
+    } else {
+        res.sendStatus(403)
     }
 };
 export default messagesController;

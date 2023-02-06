@@ -23,6 +23,8 @@ if (OwnJWT.Flag === true) {
         .get(messagesController.getAccountPhonesJWT)
     router.route('/messages/files/:id')
         .get(messagesController.getfiles)
+    router.route('/messages/files')
+        .get(messagesController.getMessageWhitFilesJWT)
 
 }
 else {
