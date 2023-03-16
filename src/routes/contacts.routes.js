@@ -10,7 +10,8 @@ if (OwnJWT.Flag === true) {
         .put(contactController.putContactByIdJWT)
         .delete(contactController.deleteContactByIdJWT)
         .get(contactController.getContactByIdJWT)
-
+    router.route('/contactsfile')
+        .post(contactController.postCreateContactXLSXJWT)
 }
 else {
     router.route('/contacts')

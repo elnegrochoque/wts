@@ -12,7 +12,7 @@ import phone from "./models/phones.models.js";
 import contactsRoutes from "./routes/contacts.routes.js"
 import { fileURLToPath } from "url";
 import { dirname } from "path";
-
+import fileUpload from "express-fileupload";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -20,10 +20,16 @@ const app = express();
 app.use(express.json());
 
 app.use(express.static(path.join(__dirname, "../public")));
+
+app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 app.use(cors());
 app.listen(PORT.PORT, () => console.log("webhook is listening"));
-
+app.use(fileUpload({
+    useTempFiles: true,
+    tempFileDir:"/tmp/",
+    debug: true
+  }));
 app.post("/webhook", async (req, res) => {
     if (req && req.body && req.body.object) {
         if (

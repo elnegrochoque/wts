@@ -1,7 +1,7 @@
 
 import { permissionJWTVerify } from "./jwt.controllers.js";
 import contact from "../models/contacts.models.js";
-
+import XLSX from "xlsx"
 
 const contactController = {};
 
@@ -591,7 +591,7 @@ contactController.getContactByIdJWT = async (req, res) => {
                         const id = req.params.id
                         const objectContact = await contact.findById(id);
                         objectContact.push({ status: true })
-                        res.status(200).json( objectContact);
+                        res.status(200).json(objectContact);
                     } else {
                         const id = req.params.id
                         const objectContact = await contact.find({ _id: id, bussinesAccountId: permission.user.user.bussinesAccountId });
@@ -616,5 +616,89 @@ contactController.getContactByIdJWT = async (req, res) => {
             mensaje: "error al obtener informacion",
         });
     }
+};
+contactController.postCreateContactXLSXJWT = async (req, res) => {
+    try {
+        const baererHeader = req.headers.authorization;
+        if (typeof baererHeader !== 'undefined') {
+            const baererToken = baererHeader.split(" ")[1]
+            req.token = baererToken;
+            const permission = await permissionJWTVerify(baererToken)
+            if (permission.flag == false || (
+                permission.user.user.permisions.find(permissionsAux => permissionsAux === 'admin') == undefined &&
+                permission.user.user.permisions.find(permissionsAux => permissionsAux === 'create') == undefined)) {
+                res.sendStatus(403)
+            } else {
+                try {
+
+                    const contactsSaved = [];
+                    const contactsNotSaved = [];
+                    let path = req.files.files.tempFilePath;
+                    var workbook = XLSX.readFile(path);
+                    var sheet_name_list = workbook.SheetNames;
+                    let jsonData = XLSX.utils.sheet_to_json(
+                        workbook.Sheets[sheet_name_list[0]]
+                    );
+                    for (let i = 0; i < jsonData.length; i++) {
+                        const name = jsonData[i].name;
+                        const lastName = jsonData[i].lastName;
+                        const email = jsonData[i].email;
+                        const phone = jsonData[i].phone;
+                        const company = jsonData[i].company;
+                        if (isNum(phone)) {
+                            const newcontact = new contact({
+                                name: name,
+                                lastName: lastName,
+                                email: email,
+                                phone: phone,
+                                bussinesAccountId: permission.user.user.bussinesAccountId,
+                                tiendaId: permission.user.user.tiendaId,
+                                company: company
+                            });
+                            try {
+                                await newcontact.save();
+                                contactsSaved.push(newcontact)
+                            } catch (error) {
+                                contactsNotSaved.push(newcontact)
+                            }
+                        } else {
+                            res.status(500).json({
+                                status: false,
+                                mensaje: "Problemas al crear el contacto",
+                            });
+                        }
+                    }
+                    res.status(201).json({
+                        contactosGuardados: contactsSaved,
+                        contactosNoGuardados: contactsNotSaved,
+                        status: true,
+                    });
+
+                } catch (error) {
+                    console.log(error);
+                    if (error.code && error.code == 11000) {
+                        res.status(500).json({
+                            status: false,
+                            mensaje: "Ya existe el contacto",
+                        });
+                    } else {
+                        res.status(500).json({
+                            status: false,
+                            mensaje: "Problemas al crear contacto",
+                        });
+                    }
+                }
+            }
+        } else {
+            res.sendStatus(403)
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: false,
+            mensaje: "error al obtener informacion",
+        });
+    }
+
 };
 export default contactController;
