@@ -21,15 +21,10 @@ app.use(express.json());
 
 app.use(express.static(path.join(__dirname, "../public")));
 
-app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 app.use(cors());
 app.listen(PORT.PORT, () => console.log("webhook is listening"));
-app.use(fileUpload({
-    useTempFiles: true,
-    tempFileDir:"/tmp/",
-    debug: true
-  }));
+
 app.post("/webhook", async (req, res) => {
     if (req && req.body && req.body.object) {
         if (
@@ -41,7 +36,7 @@ app.post("/webhook", async (req, res) => {
         ) {
             try {
                 const to = req.body.entry[0].changes[0].value.metadata.display_phone_number
-                const phoneAux = await phone.find({phoneNumber: to})
+                const phoneAux = await phone.find({ phoneNumber: to })
                 await phone.findOneAndUpdate({ phoneNumber: to }, { $inc: { 'hits': 1 } });
                 const newMessage = new message({
                     message: req.body.entry[0].changes[0].value.messages[0].text.body,
@@ -82,4 +77,8 @@ app.get("/webhook", (req, res) => {
 
 app.use("/api", messagesRoutes);
 app.use("/api", phonesRoutes);
-app.use("/api", contactsRoutes);
+app.use("/api", express.urlencoded({ extended: true }), fileUpload({
+    useTempFiles: true,
+    tempFileDir: "/tmp/",
+    debug: true
+}), contactsRoutes);
